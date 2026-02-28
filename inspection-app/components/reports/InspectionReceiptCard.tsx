@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { CompletedInspection } from '../../../types/inspection';
-import { colors } from '../../../constants/colors';
-import { typography } from '../../../constants/typography';
-import { generateActionableItemsPDF, generateFormOrderPDF, generateSeverityOrderPDF, generateSummaryReportPDF } from '../../../services/pdfReportService';
+import { CompletedInspection } from '../../types/inspection';
+import { colors } from '../../constants/colors';
+import { typography } from '../../constants/typography';
+import { generateActionableItemsPDF, generateFormOrderPDF, generateSeverityOrderPDF, generateSummaryReportPDF } from '../../services/pdfReportService';
 
 export default function InspectionReceiptCard({ inspection }: { inspection: CompletedInspection }) {
 

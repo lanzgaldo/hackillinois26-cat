@@ -30,7 +30,7 @@ export default function PartsOrderScreen() {
 
     const handleSubmit = () => {
         Alert.alert('Order Submitted', `Successfully ordered ${totalItems} parts.`);
-        router.replace('/');
+        router.replace('/(tabs)/inspections' as any);
     };
 
     return (

@@ -88,7 +88,7 @@ export default function SummaryScreen() {
                 <Pressable style={styles.orderButton} onPress={generateParts} accessibilityRole="button">
                     <Text style={styles.orderButtonText}>GENERATE PARTS ORDER</Text>
                 </Pressable>
-                <Pressable style={styles.shareButton} onPress={() => router.replace('/')} accessibilityRole="button">
+                <Pressable style={styles.shareButton} onPress={() => router.replace('/(tabs)/inspections' as any)} accessibilityRole="button">
                     <Text style={styles.shareText}>RETURN TO DASHBOARD</Text>
                 </Pressable>
             </View>

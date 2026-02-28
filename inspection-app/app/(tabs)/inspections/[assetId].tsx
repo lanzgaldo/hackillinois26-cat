@@ -9,7 +9,7 @@ import { colors } from '../../../constants/colors';
 import StickyInspectionHeader from '../../../components/inspection/StickyInspectionHeader';
 import AccordionSection from '../../../components/inspection/AccordionSection';
 import FloatingActionTab from '../../../components/inspection/FloatingActionTab';
-import BottomActionBar from '../../../components/inspection/BottomActionBar';
+import BottomActionBar from '../../../components/shared/BottomActionBar';
 
 export default function ActiveInspectionScreen() {
     const { assetId } = useLocalSearchParams<{ assetId: string }>();

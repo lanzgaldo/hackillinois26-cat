@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../constants/colors';
-import { typography } from '../constants/typography';
+import { colors } from '../../../constants/colors';
+import { typography } from '../../../constants/typography';
 
 const MOCK_ASSETS = [
     { id: '1', assetId: 'D8T-004', model: 'D8T Track-Type Tractor', lastDate: '2026-02-26', status: 'green' },
@@ -15,7 +15,7 @@ export default function DashboardScreen() {
     const router = useRouter();
 
     const handleStart = (assetId: string) => {
-        router.push(`/inspections/${assetId}`);
+        router.push(`/inspections/${assetId}` as any);
     };
 
     const getStatusColor = (status: string) => {
