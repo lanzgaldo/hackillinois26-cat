@@ -1,0 +1,26 @@
+{
+    "inspection_summary": {
+        "asset": "CAT D6N Dozer",
+        "status": "fail",
+        "overall_operational_impact": "Hydraulic leak poses risk"
+    },
+    "anomalies": [
+        {
+            "component": "Hydraulic Line",
+            "component_location": "Left side undercarriage",
+            "issue": "Active Hydraulic Leak",
+            "condition_description": "Fluid dripping from hydraulic line",
+            "severity": "Critical",
+            "safety_impact_assessment": "Fluid on undercarriage is slip hazard",
+            "operational_impact": "Loss of hydraulic pressure",
+            "estimated_timeline": "Replace immediately before next operation",
+            "recommended_action": "Stop operation, replace hydraulic line",
+            "part_number": "PT-D6N-HYD-003",
+            "evidence_backed": false,
+            "technician_review_required": false,
+            "confidence_score": 82
+        }
+    ],
+    "raw_transcript": "Hydraulic align on the left side has a visible leak. Fluid is dripping onto the underfinch.",
+    "vision_raw": null
+}
