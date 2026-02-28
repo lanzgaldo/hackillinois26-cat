@@ -1,0 +1,6 @@
+{
+  "error": "Failed to extract structured note",
+  "details": "HTTP Error 400: Bad Request",
+  "raw_transcript": "Hello, my name is Lance Galdow. It is 11.34 pm. It is February 27th, 2026.",
+  "vision_raw": null
+}
