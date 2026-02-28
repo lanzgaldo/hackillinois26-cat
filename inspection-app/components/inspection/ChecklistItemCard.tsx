@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { ChecklistItem, Status } from '../../constants/inspectionCategories';
@@ -7,17 +7,18 @@ import { colors } from '../../constants/colors';
 import { typography } from '../../constants/typography';
 import StatusToggle from './StatusToggle';
 import TimelineChipSelector from './TimelineChipSelector';
-import PhotoCapture from '../shared/PhotoCapture';
-import VoiceRecorder from '../shared/VoiceRecorder';
 import AISuggestionChip from './AISuggestionChip';
+import AttachmentRow from './AttachmentRow';
+import TranscriptReviewSheet from './TranscriptReviewSheet';
 
 interface Props {
     item: ChecklistItem;
 }
 
 export default function ChecklistItemCard({ item }: Props) {
-    const { state, updateItemStatus } = useInspection();
+    const { state, updateItemStatus, updateItemVoiceNote, addItemPhoto, removeItemPhoto } = useInspection();
     const itemState = state.itemStates[item.id] || { status: null };
+    const [pendingTranscript, setPendingTranscript] = useState<{ text: string } | null>(null);
 
     const handleStatusChange = (status: Status) => {
         updateItemStatus(item.id, status, itemState.timelineEstimate);
@@ -47,24 +48,41 @@ export default function ChecklistItemCard({ item }: Props) {
                 />
             )}
 
-            {itemState.status === 'red' && (
-                <Animated.View style={[styles.redSubArea, expandStyle]}>
-                    <Text style={styles.redHeader}>REQUIRED ACTION DETAILS</Text>
-
-                    <View style={styles.actionRow}>
-                        <VoiceRecorder itemId={item.id} />
-                    </View>
-                    <View style={[styles.actionRow, { marginTop: 12 }]}>
-                        <PhotoCapture itemId={item.id} />
-                    </View>
-                </Animated.View>
-            )}
+            <AttachmentRow
+                itemId={item.id}
+                voiceNoteUri={itemState.voiceNoteUri || null}
+                voiceNoteTranscript={itemState.voiceNoteEditedTranscript || itemState.voiceNoteTranscript || null}
+                photos={itemState.photos || []}
+                onVoiceStart={() => { }}
+                onVoiceStop={(uri) => updateItemVoiceNote(item.id, uri, null)}
+                onPhotoCapture={(uri) => addItemPhoto(item.id, uri)}
+                onPhotoRemove={(uri) => removeItemPhoto(item.id, uri)}
+                onTranscriptReady={(transcript) => setPendingTranscript({ text: transcript })}
+            />
 
             {item.id === 'eng_1' && itemState.status === 'red' && (
                 <AISuggestionChip
                     suggestion="Oil level is critically low. Inspect underneath for active leaks."
                     onAccept={() => updateItemStatus(item.id, 'red')}
                     onDismiss={() => { }}
+                />
+            )}
+
+            {pendingTranscript && (
+                <TranscriptReviewSheet
+                    visible={!!pendingTranscript}
+                    itemName={item.name}
+                    initialTranscript={pendingTranscript.text}
+                    onSave={(finalText, wasEdited) => {
+                        updateItemVoiceNote(
+                            item.id,
+                            itemState.voiceNoteUri || null,
+                            pendingTranscript.text,
+                            wasEdited ? finalText : null
+                        );
+                        setPendingTranscript(null);
+                    }}
+                    onCancel={() => setPendingTranscript(null)}
                 />
             )}
         </View>
@@ -85,22 +103,5 @@ const styles = StyleSheet.create({
         fontSize: typography.sizes.body,
         color: colors.textPrimary,
         marginBottom: 16,
-    },
-    redSubArea: {
-        marginTop: 16,
-        paddingTop: 16,
-        borderTopWidth: 1,
-        borderTopColor: colors.border,
-    },
-    redHeader: {
-        fontFamily: typography.families.ui,
-        fontSize: typography.sizes.minimumLabel,
-        color: colors.statusRed,
-        marginBottom: 12,
-    },
-    actionRow: {
-        flexDirection: 'row',
-        gap: 16,
-        alignItems: 'center',
     }
 });

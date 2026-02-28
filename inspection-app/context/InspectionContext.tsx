@@ -20,6 +20,16 @@ export interface InspectionPhoto {
 export interface InspectionItemState {
     status: Status;
     timelineEstimate?: string; // For yellow warnings
+    voiceNoteUri?: string | null;
+    voiceNoteTranscript?: string | null;
+    voiceNoteEditedTranscript?: string | null;
+    photos?: string[];
+}
+
+export interface AIReview {
+    narrative: string;
+    urgentFlags: string[];
+    recommendedAction: string;
 }
 
 export interface InspectionState {
@@ -28,8 +38,11 @@ export interface InspectionState {
     isDraft: boolean;
     isSubmitted: boolean;
     itemStates: Record<string, InspectionItemState>;
-    notes: Record<string, InspectionNote[]>;
-    photos: Record<string, InspectionPhoto[]>;
+    notes: Record<string, InspectionNote[]>; // legacy
+    photos: Record<string, InspectionPhoto[]>; // legacy
+    aiReview: AIReview | null;
+    aiReviewLoading: boolean;
+    aiReviewError: boolean;
 }
 
 interface InspectionContextType {
@@ -40,6 +53,11 @@ interface InspectionContextType {
     submitInspection: () => void;
     resetInspection: (assetId: string) => void;
     removePhoto: (itemId: string, photoId: string) => void;
+    // New Actions
+    updateItemVoiceNote: (itemId: string, uri: string | null, transcript: string | null, editedTranscript?: string | null) => void;
+    addItemPhoto: (itemId: string, uri: string) => void;
+    removeItemPhoto: (itemId: string, uri: string) => void;
+    fetchAiReview: () => Promise<void>;
 }
 
 const initialState: InspectionState = {
@@ -50,6 +68,9 @@ const initialState: InspectionState = {
     itemStates: {},
     notes: {},
     photos: {},
+    aiReview: null,
+    aiReviewLoading: false,
+    aiReviewError: false,
 };
 
 const InspectionContext = createContext<InspectionContextType | undefined>(undefined);
@@ -84,7 +105,7 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
 
     // Global Timer for the active inspection
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval>;
         if (state.assetId && !state.isSubmitted && isLoaded) {
             interval = setInterval(() => {
                 setState(prev => ({ ...prev, elapsedSeconds: prev.elapsedSeconds + 1, isDraft: true }));
@@ -137,9 +158,67 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         }));
     };
 
+    const updateItemVoiceNote = (itemId: string, uri: string | null, transcript: string | null, editedTranscript: string | null = null) => {
+        setState(prev => {
+            const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
+            return {
+                ...prev,
+                itemStates: {
+                    ...prev.itemStates,
+                    [itemId]: { ...currentItem, voiceNoteUri: uri, voiceNoteTranscript: transcript, voiceNoteEditedTranscript: editedTranscript }
+                },
+                isDraft: true,
+            };
+        });
+    };
+
+    const addItemPhoto = (itemId: string, uri: string) => {
+        setState(prev => {
+            const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
+            const existingPhotos = currentItem.photos || [];
+            if (existingPhotos.includes(uri)) return prev;
+            return {
+                ...prev,
+                itemStates: {
+                    ...prev.itemStates,
+                    [itemId]: { ...currentItem, photos: [...existingPhotos, uri] }
+                },
+                isDraft: true,
+            };
+        });
+    };
+
+    const removeItemPhoto = (itemId: string, uri: string) => {
+        setState(prev => {
+            const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
+            const existingPhotos = currentItem.photos || [];
+            return {
+                ...prev,
+                itemStates: {
+                    ...prev.itemStates,
+                    [itemId]: { ...currentItem, photos: existingPhotos.filter(p => p !== uri) }
+                },
+                isDraft: true,
+            };
+        });
+    };
+
+    const fetchAiReview = async () => {
+        setState(prev => ({ ...prev, aiReviewLoading: true, aiReviewError: false }));
+        try {
+            // we will wire this to a service later
+            const { generateAiReview } = await import('../services/aiReviewService');
+            const review = await generateAiReview(state);
+            setState(prev => ({ ...prev, aiReview: review, aiReviewLoading: false }));
+        } catch (e) {
+            console.error(e);
+            setState(prev => ({ ...prev, aiReviewError: true, aiReviewLoading: false }));
+        }
+    };
+
     const submitInspection = () => {
         setState(prev => ({ ...prev, isSubmitted: true }));
-        // In reality this would fire off the payload to the Cat backend
+        fetchAiReview();
     };
 
     const resetInspection = (assetId: string) => {
@@ -149,7 +228,10 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
     };
 
     return (
-        <InspectionContext.Provider value={{ state, updateItemStatus, addNote, addPhoto, removePhoto, submitInspection, resetInspection }}>
+        <InspectionContext.Provider value={{
+            state, updateItemStatus, addNote, addPhoto, removePhoto, submitInspection, resetInspection,
+            updateItemVoiceNote, addItemPhoto, removeItemPhoto, fetchAiReview
+        }}>
             {children}
         </InspectionContext.Provider>
     );
