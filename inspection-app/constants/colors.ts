@@ -1,0 +1,17 @@
+export const colors = {
+    background: '#080808',
+    surfaceCard: '#141414',
+    elevatedSurface: '#1E1E1E',
+    border: '#2A2A2A',
+    primary: '#FFCD11',
+    primaryDim: 'rgba(255, 205, 17, 0.12)',
+    primaryBorder: 'rgba(255, 205, 17, 0.3)',
+    textPrimary: '#F2F0EB',
+    textSecondary: '#888888',
+    statusRed: '#E53935',
+    statusYellow: '#FFCD11',
+    statusGreen: '#43A047',
+    statusRedDim: 'rgba(229, 57, 53, 0.15)',
+    statusYellowDim: 'rgba(255, 205, 17, 0.15)',
+    statusGreenDim: 'rgba(67, 160, 71, 0.15)',
+};
