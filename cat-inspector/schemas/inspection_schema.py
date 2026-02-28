@@ -39,6 +39,7 @@ class OperationalStatus(str, Enum):
     STOP    = "STOP"          # One or more Critical anomalies
     CAUTION = "CAUTION"       # One or more Moderate anomalies, no Critical
     GO      = "GO"            # All Normal
+    PENDING_VERIFICATION = "PENDING_VERIFICATION"
 
 class ConfidenceLevel(str, Enum):
     HIGH   = "High"           # 0.90–1.00 — clear visual evidence
@@ -76,6 +77,47 @@ class Anomaly(BaseModel):
                                             description="Per-anomaly detection confidence 0.0–1.0")
     detection_basis:          str     = Field(..., description="Visual evidence cited, e.g. 'rust discoloration on rim flange'")
 
+    technician_confirmed: Optional[bool] = Field(
+        default=None,
+        description=(
+            "True = technician confirms AI finding. "
+            "False = technician rejects finding, exclude from scoring. "
+            "None = not yet reviewed — pipeline in PENDING state."
+        )
+    )
+    technician_severity_override: Optional[Severity] = Field(
+        default=None,
+        description=(
+            "If set, replaces AI severity for this anomaly in final scoring. "
+            "Requires technician_override_rationale to be populated. "
+            "None = no override, use AI-assigned severity."
+        )
+    )
+    technician_notes: Optional[str] = Field(
+        default=None,
+        max_length=500,
+        description=(
+            "Free-text technician observations. "
+            "Appended to final report as supporting context. "
+            "Does not affect confidence scoring."
+        )
+    )
+    technician_override_rationale: Optional[str] = Field(
+        default=None,
+        description=(
+            "REQUIRED when technician_severity_override is set. "
+            "Explains why AI severity was overridden. "
+            "Enforced by TechnicianVerification model validator."
+        )
+    )
+
+    @model_validator(mode="after")
+    def enforce_override_rationale(self) -> "Anomaly":
+        if self.technician_severity_override is not None:
+            if not self.technician_override_rationale or str(self.technician_override_rationale).strip() == "":
+                raise ValueError("technician_override_rationale is required when technician_severity_override is set")
+        return self
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # WEIGHT VECTOR — injected by context_engine, scored by inference model
@@ -91,6 +133,52 @@ class WeightedDimension(BaseModel):
     def enforce_weighted(self) -> "WeightedDimension":
         expected = round(self.weight * self.score, 4)
         self.weighted = expected
+        return self
+
+
+class TechnicianVerification(BaseModel):
+    """
+    Technician sign-off layer. Injected into InspectionOutput
+    after SchemaValidator completes. Pipeline is halted at
+    PENDING_VERIFICATION until this model is fully populated.
+    """
+    technician_id: Optional[str] = Field(
+        default=None,
+        description="Identifier of reviewing technician. Required before sign-off."
+    )
+    technician_sign_off: Optional[bool] = Field(
+        default=None,
+        description=(
+            "True = technician approves report. "
+            "False = report flagged for supervisor review. "
+            "None = awaiting verification."
+        )
+    )
+    verification_timestamp: Optional[str] = Field(
+        default=None,
+        description="ISO 8601. System-set when sign-off written. Never accept as input."
+    )
+    operational_status_override: Optional[OperationalStatus] = Field(
+        default=None,
+        description=(
+            "Technician override of final operational_status. "
+            "Cannot override STOP to GO if unreviewed Critical anomalies exist. "
+            "None = use SchemaValidator result."
+        )
+    )
+    verification_notes: Optional[str] = Field(
+        default=None,
+        max_length=1000,
+        description="Overall technician comments on the inspection report."
+    )
+
+    @model_validator(mode="after")
+    def enforce_sign_off_requires_id(self) -> "TechnicianVerification":
+        if self.technician_sign_off is True:
+            if not self.technician_id or str(self.technician_id).strip() == "":
+                raise ValueError(
+                    "technician_id is required before technician_sign_off can be True"
+                )
         return self
 
 
@@ -145,6 +233,8 @@ class InspectionSummary(BaseModel):
 
     @model_validator(mode="after")
     def derive_status(self) -> "InspectionSummary":
+        if getattr(self, "operational_status", None) == OperationalStatus.PENDING_VERIFICATION:
+            return self
         if self.critical_count > 0:
             self.operational_status = OperationalStatus.STOP
         elif self.moderate_count > 0:
@@ -182,9 +272,32 @@ class InspectionOutput(BaseModel):
     confidence_scoring:  ConfidenceScoring
     anomalies:           list[Anomaly]
     summary:             InspectionSummary
+    technician_verification: Optional[TechnicianVerification] = Field(
+        default=None,
+        description=(
+            "Populated after SchemaValidator completes. "
+            "None = verification not yet initiated. "
+            "Pipeline halts at PENDING_VERIFICATION until "
+            "this is fully populated and signed off."
+        )
+    )
 
     def to_json(self, indent: int = 2) -> str:
-        return self.model_dump_json(indent=indent)
+        return self.model_dump_json(indent=indent, exclude_none=True)
+
+    @model_validator(mode="after")
+    def enforce_technician_constraints(self) -> "InspectionOutput":
+        # Rule 1: STOP cannot be overridden to GO if any Critical anomaly has technician_confirmed = None or True
+        # without a severity override to Moderate or Normal
+        if self.technician_verification is not None:
+            ov = getattr(self.technician_verification, "operational_status_override", None)
+            if ov == OperationalStatus.GO:
+                for anomaly in self.anomalies:
+                    if anomaly.severity == Severity.CRITICAL:
+                        if anomaly.technician_confirmed is None or anomaly.technician_confirmed is True:
+                            if anomaly.technician_severity_override not in (Severity.MODERATE, Severity.NORMAL):
+                                raise ValueError("Cannot override status to GO with unmitigated Critical anomalies")
+        return self
 
     @classmethod
     def example_pass(cls) -> "InspectionOutput":
