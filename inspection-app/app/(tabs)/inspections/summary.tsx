@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useInspection } from '../../context/InspectionContext';
-import { colors } from '../../constants/colors';
-import { typography } from '../../constants/typography';
-import { CATEGORIES } from '../../constants/inspectionCategories';
+import { useInspection } from '../../../context/InspectionContext';
+import { colors } from '../../../constants/colors';
+import { typography } from '../../../constants/typography';
+import { CATEGORIES } from '../../../constants/inspectionCategories';
 
 export default function SummaryScreen() {
     const router = useRouter();

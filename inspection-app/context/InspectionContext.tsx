@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CATEGORIES, Status } from '../constants/inspectionCategories';
+import { CompletedInspection } from '../types/inspection';
+import { router } from 'expo-router';
 
 export interface InspectionNote {
     id: string;
@@ -216,9 +218,52 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         }
     };
 
-    const submitInspection = () => {
+    const submitInspection = async () => {
         setState(prev => ({ ...prev, isSubmitted: true }));
         fetchAiReview();
+
+        // Build Payload
+        const completed: CompletedInspection = {
+            inspectionId: `INSP-${Date.now()}`,
+            inspectorName: 'Megan Tech', // Mock User
+            assetId: state.assetId,
+            serialNumber: state.assetId + 'XXX', // Mock
+            model: 'Caterpillar Heavy Equipment', // Mock
+            customerName: 'Default Client Inc',
+            submittedAt: new Date().toISOString(),
+            elapsedSeconds: state.elapsedSeconds,
+            generalComments: null,
+            aiReview: state.aiReview,
+            items: []
+        };
+
+        CATEGORIES.forEach(category => {
+            category.items.forEach(item => {
+                const itemState = state.itemStates[item.id];
+                if (itemState) {
+                    completed.items.push({
+                        id: item.id,
+                        name: item.name,
+                        category: category.name,
+                        status: itemState.status as any,
+                        voiceNoteTranscript: itemState.voiceNoteTranscript || null,
+                        voiceNoteEditedTranscript: itemState.voiceNoteEditedTranscript || null,
+                        photos: itemState.photos || [],
+                        timelineEstimate: itemState.timelineEstimate || null
+                    });
+                }
+            });
+        });
+
+        const raw = await AsyncStorage.getItem('cat_track_completed_inspections');
+        let history: CompletedInspection[] = raw ? JSON.parse(raw) : [];
+        history.unshift(completed);
+
+        if (history.length > 100) {
+            history = history.slice(0, 100);
+        }
+
+        await AsyncStorage.setItem('cat_track_completed_inspections', JSON.stringify(history));
     };
 
     const resetInspection = (assetId: string) => {

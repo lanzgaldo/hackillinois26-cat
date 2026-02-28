@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useInspection } from '../../context/InspectionContext';
-import { CATEGORIES } from '../../constants/inspectionCategories';
-import { colors } from '../../constants/colors';
+import { useInspection } from '../../../context/InspectionContext';
+import { CATEGORIES } from '../../../constants/inspectionCategories';
+import { colors } from '../../../constants/colors';
 
-import StickyInspectionHeader from '../../components/inspection/StickyInspectionHeader';
-import AccordionSection from '../../components/inspection/AccordionSection';
-import FloatingActionTab from '../../components/inspection/FloatingActionTab';
-import BottomActionBar from '../../components/shared/BottomActionBar';
+import StickyInspectionHeader from '../../../components/inspection/StickyInspectionHeader';
+import AccordionSection from '../../../components/inspection/AccordionSection';
+import FloatingActionTab from '../../../components/inspection/FloatingActionTab';
+import BottomActionBar from '../../../components/inspection/BottomActionBar';
 
 export default function ActiveInspectionScreen() {
     const { assetId } = useLocalSearchParams<{ assetId: string }>();
@@ -24,7 +24,7 @@ export default function ActiveInspectionScreen() {
 
     const handleSubmit = () => {
         submitInspection();
-        router.replace('/inspection/summary');
+        router.replace('/inspections/review');
     };
 
     return (

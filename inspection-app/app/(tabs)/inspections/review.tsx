@@ -4,10 +4,10 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withSequence } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { useInspection } from '../../context/InspectionContext';
-import { colors } from '../../constants/colors';
-import { typography } from '../../constants/typography';
-import { CATEGORIES } from '../../constants/inspectionCategories';
+import { useInspection } from '../../../context/InspectionContext';
+import { colors } from '../../../constants/colors';
+import { typography } from '../../../constants/typography';
+import { CATEGORIES } from '../../../constants/inspectionCategories';
 
 export default function AIReviewScreen() {
     const router = useRouter();

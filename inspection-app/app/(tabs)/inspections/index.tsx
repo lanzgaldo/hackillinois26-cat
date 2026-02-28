@@ -15,7 +15,7 @@ export default function DashboardScreen() {
     const router = useRouter();
 
     const handleStart = (assetId: string) => {
-        router.push(`/inspection/${assetId}`);
+        router.push(`/inspections/${assetId}`);
     };
 
     const getStatusColor = (status: string) => {
