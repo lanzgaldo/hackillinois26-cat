@@ -141,7 +141,7 @@ TARGET SCHEMA TO MATCH EXACTLY:
 def transcribe_audio(audio_bytes: bytes) -> str:
     import whisper
     
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_file:
         tmp_file.write(audio_bytes)
         tmp_filename = tmp_file.name
         
@@ -327,11 +327,13 @@ def main(audio_path: str = None, image_path: str = None):
     
     if not audio_path:
         # Fallback to look for sample.wav if no arg provided
-        if os.path.exists("sample.wav"):
+        if os.path.exists("sample.mp3"):
+            audio_path = "sample.mp3"
+        elif os.path.exists("sample.wav"):
             audio_path = "sample.wav"
         else:
             print("Usage: modal run modal_app.py --audio-path <audio_file> [--image-path <image_file>]")
-            print("Or ensure 'sample.wav' exists in the current directory.")
+            print("Or ensure 'sample.mp3' or 'sample.wav' exists in the current directory.")
             return
 
     with open(audio_path, "rb") as f:
