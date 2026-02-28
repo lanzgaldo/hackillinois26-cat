@@ -1,0 +1,116 @@
+{
+  "timestamp": "20260228T094857",
+  "total_examples": 12,
+  "passed": 9,
+  "failed": 3,
+  "results": [
+    {
+      "image_file": "BrokenRimBolt1.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": false,
+      "passed_regression": true,
+      "overall_pass": false
+    },
+    {
+      "image_file": "BrokenRimBolt2.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": false,
+      "passed_regression": true,
+      "overall_pass": false
+    },
+    {
+      "image_file": "GoodStep.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": false,
+      "passed_regression": true,
+      "overall_pass": false
+    },
+    {
+      "image_file": "RustOnHydraulicComponentBracket.jpg",
+      "label": "FAIL",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "StructuralDamage.jpg",
+      "label": "FAIL",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "Tire_ShowsSignsUnevenWear.jpg",
+      "label": "FAIL",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "CoolantReservoir.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HousingSeal.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HydraulicFluidFiltrationSystem.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HydraulicFluidTank.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HydraulicHose.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "CoolingSystemHose.jpg",
+      "label": "FAIL",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    }
+  ]
+}

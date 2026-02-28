@@ -1,0 +1,98 @@
+{
+  "timestamp": "20260228T093641",
+  "total_examples": 12,
+  "passed": 6,
+  "failed": 6,
+  "results": [
+    {
+      "image_file": "BrokenRimBolt1.jpg",
+      "label": "PASS",
+      "success": false,
+      "error": "Could not deserialize remote exception due to local error:\nEncountered an error when deserializing an object in the local environment (see above for details).\nThis can happen if your local environment does not have the remote exception definitions.\nHere is the remote traceback:\nTraceback (most recent call last):\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 947, in handle_input_exception\n    yield\n  File \"/pkg/modal/_container_entrypoint.py\", line 172, in run_input_sync\n    values = io_context.call_function_sync()\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 225, in call_function_sync\n    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/worker.py\", line 173, in inspect_image\n    response = client.messages.create(\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_utils/_utils.py\", line 282, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/resources/messages/messages.py\", line 996, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1364, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1137, in request\n    raise self._make_status_error_from_response(err.response) from None\nanthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CYaEmJEXfb1Ntt7XUXo7s'}\n"
+    },
+    {
+      "image_file": "BrokenRimBolt2.jpg",
+      "label": "PASS",
+      "success": false,
+      "error": "Could not deserialize remote exception due to local error:\nEncountered an error when deserializing an object in the local environment (see above for details).\nThis can happen if your local environment does not have the remote exception definitions.\nHere is the remote traceback:\nTraceback (most recent call last):\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 947, in handle_input_exception\n    yield\n  File \"/pkg/modal/_container_entrypoint.py\", line 172, in run_input_sync\n    values = io_context.call_function_sync()\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 225, in call_function_sync\n    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/worker.py\", line 173, in inspect_image\n    response = client.messages.create(\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_utils/_utils.py\", line 282, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/resources/messages/messages.py\", line 996, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1364, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1137, in request\n    raise self._make_status_error_from_response(err.response) from None\nanthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CYaEnBzGmhbmRYzSWatAJ'}\n"
+    },
+    {
+      "image_file": "GoodStep.jpg",
+      "label": "PASS",
+      "success": false,
+      "error": "Could not deserialize remote exception due to local error:\nEncountered an error when deserializing an object in the local environment (see above for details).\nThis can happen if your local environment does not have the remote exception definitions.\nHere is the remote traceback:\nTraceback (most recent call last):\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 947, in handle_input_exception\n    yield\n  File \"/pkg/modal/_container_entrypoint.py\", line 172, in run_input_sync\n    values = io_context.call_function_sync()\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 225, in call_function_sync\n    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/worker.py\", line 173, in inspect_image\n    response = client.messages.create(\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_utils/_utils.py\", line 282, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/resources/messages/messages.py\", line 996, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1364, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1137, in request\n    raise self._make_status_error_from_response(err.response) from None\nanthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CYaEo66ay2mFxCrWiayRC'}\n"
+    },
+    {
+      "image_file": "RustOnHydraulicComponentBracket.jpg",
+      "label": "FAIL",
+      "success": false,
+      "error": "Could not deserialize remote exception due to local error:\nEncountered an error when deserializing an object in the local environment (see above for details).\nThis can happen if your local environment does not have the remote exception definitions.\nHere is the remote traceback:\nTraceback (most recent call last):\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 947, in handle_input_exception\n    yield\n  File \"/pkg/modal/_container_entrypoint.py\", line 172, in run_input_sync\n    values = io_context.call_function_sync()\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 225, in call_function_sync\n    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/worker.py\", line 173, in inspect_image\n    response = client.messages.create(\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_utils/_utils.py\", line 282, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/resources/messages/messages.py\", line 996, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1364, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1137, in request\n    raise self._make_status_error_from_response(err.response) from None\nanthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CYaEoy3x25PeiwnHM3jc2'}\n"
+    },
+    {
+      "image_file": "StructuralDamage.jpg",
+      "label": "FAIL",
+      "success": false,
+      "error": "Could not deserialize remote exception due to local error:\nEncountered an error when deserializing an object in the local environment (see above for details).\nThis can happen if your local environment does not have the remote exception definitions.\nHere is the remote traceback:\nTraceback (most recent call last):\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 947, in handle_input_exception\n    yield\n  File \"/pkg/modal/_container_entrypoint.py\", line 172, in run_input_sync\n    values = io_context.call_function_sync()\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 225, in call_function_sync\n    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/worker.py\", line 173, in inspect_image\n    response = client.messages.create(\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_utils/_utils.py\", line 282, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/resources/messages/messages.py\", line 996, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1364, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1137, in request\n    raise self._make_status_error_from_response(err.response) from None\nanthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CYaEprhF3Lt6PwPbHR7Rz'}\n"
+    },
+    {
+      "image_file": "Tire_ShowsSignsUnevenWear.jpg",
+      "label": "FAIL",
+      "success": false,
+      "error": "Could not deserialize remote exception due to local error:\nEncountered an error when deserializing an object in the local environment (see above for details).\nThis can happen if your local environment does not have the remote exception definitions.\nHere is the remote traceback:\nTraceback (most recent call last):\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 947, in handle_input_exception\n    yield\n  File \"/pkg/modal/_container_entrypoint.py\", line 172, in run_input_sync\n    values = io_context.call_function_sync()\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/pkg/modal/_runtime/container_io_manager.py\", line 225, in call_function_sync\n    expected_value_or_values = self.finalized_function.callable(*args, **kwargs)\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/worker.py\", line 173, in inspect_image\n    response = client.messages.create(\n               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_utils/_utils.py\", line 282, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/resources/messages/messages.py\", line 996, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1364, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/anthropic/_base_client.py\", line 1137, in request\n    raise self._make_status_error_from_response(err.response) from None\nanthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CYaEqkdPoByFjSmaPN78m'}\n"
+    },
+    {
+      "image_file": "CoolantReservoir.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HousingSeal.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HydraulicFluidFiltrationSystem.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HydraulicFluidTank.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "HydraulicHose.jpg",
+      "label": "PASS",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    },
+    {
+      "image_file": "CoolingSystemHose.jpg",
+      "label": "FAIL",
+      "success": true,
+      "schema_valid": true,
+      "passed_expected": true,
+      "passed_regression": true,
+      "overall_pass": true
+    }
+  ]
+}

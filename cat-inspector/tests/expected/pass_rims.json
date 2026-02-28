@@ -1,0 +1,74 @@
+{
+    "inspection_metadata": {
+        "equipment_type": "Caterpillar Heavy Equipment",
+        "component_category": "tires_rims",
+        "inspection_timestamp": "2025-02-28T12:00:00Z",
+        "image_filename": "BrokenRimBolt1.jpg",
+        "model_version": "cat-inspect-v1",
+        "subsection_prompt": "prompts/subsections/tires_rims.md",
+        "weight_profile": "default"
+    },
+    "confidence_scoring": {
+        "visual_clarity": {
+            "weight": 0.35,
+            "score": 0.0,
+            "weighted": 0.0
+        },
+        "severity_match": {
+            "weight": 0.30,
+            "score": 0.0,
+            "weighted": 0.0
+        },
+        "context_alignment": {
+            "weight": 0.20,
+            "score": 0.0,
+            "weighted": 0.0
+        },
+        "field_history": {
+            "weight": 0.15,
+            "score": 0.0,
+            "weighted": 0.0
+        },
+        "overall_confidence": 0.0,
+        "confidence_level": "Low"
+    },
+    "anomalies": [
+        {
+            "anomaly_id": "A001",
+            "component_location": "Front left Wheel Hardware",
+            "component_type": "Wheel Hardware",
+            "issue": "Loose or Missing Wheel Hardware",
+            "condition_description": "One lug nut is visibly missing, compromising wheel stability and increasing the risk of wheel separation.",
+            "severity": "Critical",
+            "safety_impact_assessment": "Critical — Wheel separation hazard.",
+            "visibility_impact": "",
+            "operational_impact": "Compromised safety and mobility due to critical rim and hardware issues.",
+            "recommended_action": "Immediate inspection and replacement of missing lug nut; verify all hardware is secure.",
+            "anomaly_confidence": 0.0,
+            "detection_basis": ""
+        },
+        {
+            "anomaly_id": "A002",
+            "component_location": "Front left Tire",
+            "component_type": "Tire",
+            "issue": "Moderate Tire Wear",
+            "condition_description": "Tread appears worn but still functional; no critical damage to the sidewalls or surface.",
+            "severity": "Moderate",
+            "safety_impact_assessment": "Moderate — Monitor tread wear and schedule replacement as needed.",
+            "visibility_impact": "",
+            "operational_impact": "Compromised safety and mobility due to critical rim and hardware issues.",
+            "recommended_action": "Monitor tread wear and schedule replacement as needed.",
+            "anomaly_confidence": 0.0,
+            "detection_basis": ""
+        }
+    ],
+    "summary": {
+        "critical_count": 1,
+        "moderate_count": 1,
+        "normal_count": 0,
+        "wheel_position": "Front left",
+        "operational_status": "STOP",
+        "priority_action": "Immediate replacement of the rim to prevent structural failure.",
+        "overall_equipment_condition": "Compromised safety and mobility due to critical rim and hardware issues."
+    }
+}
