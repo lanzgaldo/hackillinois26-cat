@@ -9,10 +9,11 @@ import asyncio
 import modal
 
 app = modal.App("cat-inspect-ai-sprint1")
+vol = modal.Volume.from_name("cat-inspector-outputs", create_if_missing=True)
 
 image = modal.Image.debian_slim().apt_install("ffmpeg").pip_install(
-    "openai-whisper", "transformers", "torch", "pillow", "accelerate"
-)
+    "openai-whisper", "transformers", "torch", "pillow", "accelerate", "pydantic"
+).add_local_dir("cat-inspector/schemas", remote_path="/root/schemas").add_local_dir("cat-inspector/pipeline", remote_path="/root/pipeline")
 
 D6N_PARTS = {
     "track":         "PT-D6N-TRK-001",
@@ -171,7 +172,7 @@ def analyze_image(image_bytes: bytes) -> dict | None:
     }
 
     data = {
-        "model": "claude-3-5-sonnet-20241022",
+        "model": "claude-sonnet-4-6",
         "max_tokens": 1024,
         "system": VISION_PROMPT,
         "messages": [
@@ -251,7 +252,7 @@ def extract_structured_note(transcript: str, vision_data: dict | None) -> dict:
     prompt = prompt.replace("{KNOWN_PARTS}", json.dumps(D6N_PARTS))
 
     data = {
-        "model": "claude-3-5-sonnet-20241022",
+        "model": "claude-sonnet-4-6",
         "max_tokens": 2048,
         "system": "You respond in valid JSON only.",
         "messages": [
@@ -282,11 +283,15 @@ def extract_structured_note(transcript: str, vision_data: dict | None) -> dict:
                 
             return json.loads(content_text.strip())
             
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8")
+        print(f"HTTPError in extract_structured_note: {e.code} - {error_body}")
+        return {"error": "Failed to extract structured note", "details": f"HTTP Error {e.code}: {error_body}"}
     except Exception as e:
         print(f"Error in extract_structured_note: {e}")
         return {"error": "Failed to extract structured note", "details": str(e)}
 
-@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=120)
+@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], volumes={"/outputs": vol}, timeout=120)
 def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None):
     # This runs remotely as the orchestrator.
     # We fork EARS and EYES using Modal's .spawn() to execute them in parallel on separate remote workers
@@ -304,18 +309,30 @@ def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None):
     if eyes_call:
         vision_raw = eyes_call.get()
         
-    # Run digestion sequentially after both are done
-    final_output = extract_structured_note.local(transcript, vision_raw) 
-    # Use .local() since we are already inside a remote function running digest_maintenance_event
-    # Or, we can just call the extraction remotely using `.remote()`
-    # Let's use remote call to encapsulate the resource logic cleanly
-    final_output = extract_structured_note.remote(transcript, vision_raw)
+    import asyncio
+    import sys
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from pipeline.context_bucket import build_context_bucket, write_context_json
     
-    # Attach raw logs
-    final_output["raw_transcript"] = transcript
-    final_output["vision_raw"] = vision_raw
+    # NEW: Route outputs through context bucket
+    context = asyncio.run(build_context_bucket(
+        raw_transcript=transcript,
+        raw_vision=vision_raw,
+        component_category="auto", 
+        inspection_type="daily_walkaround"
+    ))
     
-    return final_output
+    # NEW: Write to output/ directory
+    context_path = write_context_json(context, output_dir="/outputs")
+    
+    # EXPANDED: Pass canonical context JSON to digestion
+    final_output = extract_structured_note.remote(context.model_dump_json(), None)
+    
+    # EXPANDED: Return both context path and InspectionOutput
+    return {
+        "context_path": context_path,
+        "inspection_output": final_output
+    }
 
 @app.local_entrypoint()
 def main(audio_path: str = None, image_path: str = None):
