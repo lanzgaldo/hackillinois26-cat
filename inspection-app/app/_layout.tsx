@@ -38,9 +38,7 @@ export default function RootLayout() {
                     contentStyle: { backgroundColor: colors.background },
                 }}
             >
-                <Stack.Screen name="index" options={{ title: 'Dashboard' }} />
-                <Stack.Screen name="inspection/[assetId]" options={{ headerShown: false }} />
-                <Stack.Screen name="inspection/summary" options={{ title: 'Inspection Summary' }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="parts/index" options={{ title: 'Parts Order' }} />
             </Stack>
         </InspectionProvider>
