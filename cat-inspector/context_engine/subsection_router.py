@@ -138,6 +138,30 @@ class SubsectionRouter:
 
         return str(prompt_path), result.category
 
+    def load_subsection_prompt(self, category: str) -> tuple[str, str, str]:
+        """
+        Loads segment-specific prompt and appends the global safety
+        clause. The combined prompt is passed to Claude Vision.
+        Global clause is always appended — cannot be disabled.
+        Returns (combined_prompt_text, resolved_category, prompt_file_path).
+        """
+        prompt_path, resolved_category = self.route(category)
+        segment_prompt = Path(prompt_path).read_text(encoding="utf-8")
+        global_clause = self._load_global_clause()
+        combined = f"{segment_prompt}\n\n{global_clause}"
+        return combined, resolved_category, prompt_path
+
+    def _load_global_clause(self) -> str:
+        """
+        Loads global_safety_clause.md from prompts/global/.
+        Raises FileNotFoundError if missing — this is intentional.
+        The global clause is not optional. Pipeline must not run
+        without it.
+        """
+        path = self.BASE_DIR / "prompts/global/global_safety_clause.md"
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+
     def _resolve(self, category: str) -> RouteResult:
         normalized = category.lower().strip()
 

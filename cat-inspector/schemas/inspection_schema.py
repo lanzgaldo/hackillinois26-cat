@@ -111,6 +111,31 @@ class Anomaly(BaseModel):
         )
     )
 
+    is_global_safety_override: bool = Field(
+        default=False,
+        description=(
+            "True when this anomaly was detected by the Global Safety "
+            "Clause rather than the active segment prompt. "
+            "Indicates the finding is outside the selected segment."
+        )
+    )
+    segment_mismatch_flag: bool = Field(
+        default=False,
+        description=(
+            "True when the detected component clearly does not belong "
+            "to the active inspection segment. AI detected it with high "
+            "confidence despite segment blinders being active."
+        )
+    )
+    global_override_category: Optional[str] = Field(
+        default=None,
+        description=(
+            "Populated when is_global_safety_override is True. "
+            "One of: access_egress | structural | fluid_hazard | "
+            "fire_heat | operator_protection | ground_hazard"
+        )
+    )
+
     @model_validator(mode="after")
     def enforce_override_rationale(self) -> "Anomaly":
         if self.technician_severity_override is not None:

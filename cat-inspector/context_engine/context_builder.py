@@ -179,9 +179,8 @@ class ContextBuilder:
         # 3. Build system prompt with weight placeholders substituted
         system = self._inject_weights(self._system, weights)
 
-        # 4. Route to correct subsection prompt
-        subsection_path, matched_category = self.router.route(component_category)
-        subsection_text = Path(subsection_path).read_text()
+        # 4. Route to correct subsection prompt and load global safety clause
+        subsection_text, matched_category, subsection_path = self.router.load_subsection_prompt(component_category)
 
         # 5. Build schema template string
         schema_str = self._build_schema_template(weights)

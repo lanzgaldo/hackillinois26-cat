@@ -71,6 +71,7 @@ class SchemaValidator:
         # ── Phase 3: Pydantic parse ───────────────────────────────────────────
         try:
             output = InspectionOutput.model_validate(raw_dict)
+            output = self.enforce_global_safety_stops(output)
             return ValidationResult(True, output, raw_dict, errors, corrections)
         except Exception as e:
             errors.append(f"Pydantic validation failed: {e}")
@@ -191,3 +192,28 @@ class SchemaValidator:
             s["operational_status"] = expected
         d["summary"] = s
         return d
+
+    def enforce_global_safety_stops(self, output: InspectionOutput) -> InspectionOutput:
+        """
+        If ANY anomaly has is_global_safety_override == True
+        AND severity == Critical:
+          → operational_status must be STOP regardless of segment findings
+          → This is non-negotiable. A critical global safety hazard
+            grounds the equipment even if all segment checks pass.
+
+        Log a warning when this override fires so the UI can surface
+        a specific message: "Equipment grounded due to safety hazard
+        detected outside active inspection segment."
+        """
+        has_critical_global = False
+        for anomaly in output.anomalies:
+            if getattr(anomaly, "is_global_safety_override", False) and anomaly.severity == Severity.CRITICAL:
+                has_critical_global = True
+                break
+        
+        if has_critical_global:
+            output.summary.operational_status = OperationalStatus.STOP
+            print("WARNING: Equipment grounded due to safety hazard detected outside active inspection segment.")
+        
+        return output
+

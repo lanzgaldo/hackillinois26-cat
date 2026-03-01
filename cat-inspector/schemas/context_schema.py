@@ -17,7 +17,7 @@ class NormalizedVoiceContext(BaseModel):
     detected_components:  list[str] = Field(default_factory=list, description="Machine components referenced in the audio")
     detected_conditions:  list[str] = Field(default_factory=list, description="Conditions or damage identifiers referenced")
     technician_sentiment: Literal["urgent", "routine", "uncertain"] = Field(..., description="Classification of technician's tone/urgency")
-    inferred_severity:    Literal["Critical", "Moderate", "Normal"] = Field(..., description="Fact-based severity derived from the transcript")
+    inferred_severity:    Literal["Critical", "Moderate", "Low", "Normal"] = Field(..., description="Fact-based severity derived from the transcript")
     language_confidence:  float = Field(..., ge=0.0, le=1.0, description="Proxy for whisper transcription confidence quality")
     source:               Literal["voice"] = Field(default="voice", description="Always 'voice'")
 
@@ -31,6 +31,9 @@ class VisionFinding(BaseModel):
     component:          str = Field(..., description="Name of the part")
     observation:        str = Field(..., description="What was visually observed")
     severity_indicator: Literal["CRITICAL", "MODERATE", "LOW", "NORMAL"] = Field(..., description="Predicted severity level")
+    is_global_safety_override: bool = Field(default=False)
+    segment_mismatch_flag: bool = Field(default=False)
+    global_override_category: Optional[str] = Field(default=None)
 
 
 class NormalizedVisionContext(BaseModel):
@@ -86,13 +89,15 @@ class ContextBucketEntry(BaseModel):
     component:              str = Field(..., description="The canonical targeted component")
     component_location:     Optional[str] = Field(default=None, description="Where the component sits on the machine")
     condition_summary:      str = Field(..., description="Fused summary of the condition")
-    severity_indication:    Literal["Critical", "Moderate", "Normal"] = Field(..., description="Predicted fusion severity")
+    severity_indication:    Literal["Critical", "Moderate", "Low", "Normal"] = Field(..., description="Predicted fusion severity")
     voice_evidence:         Optional[str] = Field(default=None, description="Evidence derived from STT")
     vision_evidence:        Optional[str] = Field(default=None, description="Evidence derived from Vision")
     evidence_backed:        bool = Field(..., description="True if both modalities agree on the finding")
     technician_review_flag: bool = Field(..., description="True if a conflict exists needing manual intervention")
     source_perceptors:      list[Literal["voice", "vision"]] = Field(default_factory=list, description="Which sensors spawned this entry")
     confidence_score:       float = Field(..., ge=0.0, le=1.0, description="Composite final confidence in the finding")
+    is_global_safety_override: bool = Field(default=False, description="True when entry originates from Global Safety Clause")
+    global_override_category: Optional[str] = Field(default=None, description="Which global safety category triggered this entry")
 
 
 # ─────────────────────────────────────────────────────────────

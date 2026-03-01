@@ -1,0 +1,173 @@
+{
+  "context_id": "522a45c7-1c9b-4835-9fa4-ab779c8a9f8b",
+  "session_id": null,
+  "created_at": "2026-02-28T19:44:01.064394+00:00",
+  "schema_version": "1.0.0",
+  "asset_id": "CAT D6N Dozer",
+  "component_category": "auto",
+  "inspection_type": "daily_walkaround",
+  "image_filename": null,
+  "subsection_used": null,
+  "voice_context": null,
+  "vision_context": {
+    "visible_components": [
+      "large pneumatic tire (Goodrich/Goodyear branded)",
+      "multi-piece wheel rim assembly",
+      "rim base flange",
+      "lock ring / side ring",
+      "wheel hub face / center hub cap",
+      "wheel mounting studs and nuts (visible bolt circle)"
+    ],
+    "findings": [
+      {
+        "component": "Multi-piece wheel rim assembly - lock ring / side ring",
+        "observation": "Severe surface corrosion (rust) across entire rim face and lock ring. Orange-brown oxidation covering the majority of the rim bowl and flanges. Lock ring appears seated but corrosion obscures ability to confirm full seating integrity around full circumference. A visible gap or discontinuity is observed at approximately the 2 o'clock position on the lock ring which may indicate improper seating or a break in the ring.",
+        "severity_indicator": "CRITICAL"
+      },
+      {
+        "component": "Rim base flange / outer bead seat band",
+        "observation": "Heavy corrosion and rust accumulation on the outer flange ring. Paint coating largely absent. Flange surface shows pitting consistent with advanced oxidation. Debris and organic material (dirt, vegetation) packed into the rim gutter area between flange and tire bead.",
+        "severity_indicator": "CRITICAL"
+      },
+      {
+        "component": "Wheel hub center cap / hub face",
+        "observation": "CAT yellow paint partially intact on center hub cap. Moderate surface rust and paint degradation visible. Hub cap appears physically present and not deformed. Center dome area retains yellow paint suggesting less exposure than outer rim components.",
+        "severity_indicator": "MODERATE"
+      },
+      {
+        "component": "Wheel mounting studs and lug nuts (bolt circle)",
+        "observation": "Approximately 20 lug nuts visible in a circular bolt pattern. All appear present on visual count. Heavy corrosion on nut faces with rust staining. Individual nut condition difficult to assess precisely but no obviously missing nuts detected. Corrosion may complicate torque verification.",
+        "severity_indicator": "MODERATE"
+      },
+      {
+        "component": "Pneumatic tire (Goodrich/Goodyear - partial lettering visible)",
+        "observation": "Tire sidewall visible around full circumference in image. No visible sidewall cuts, bulges, or structural deformations observed. Tread pattern partially visible at edges appearing intact. Tire appears inflated based on profile shape. Bead area obscured by rim corrosion and debris.",
+        "severity_indicator": "LOW"
+      },
+      {
+        "component": "Rim gutter / bead seat area",
+        "observation": "Significant debris accumulation including organic material and compacted dirt visible in the rim gutter between tire bead and rim flange. This contamination combined with corrosion compromises bead sealing surface integrity.",
+        "severity_indicator": "MODERATE"
+      }
+    ],
+    "overall_confidence": 72,
+    "image_quality": "clear",
+    "critical_count": 2,
+    "moderate_count": 3,
+    "source": "vision"
+  },
+  "fusion_result": {
+    "fusion_status": "vision_only",
+    "agreement_score": 0.0,
+    "reconciled_components": [],
+    "conflict_components": [],
+    "dominant_source": "vision",
+    "fusion_notes": "Voice input unavailable. Findings derived solely from visual inference."
+  },
+  "context_entries": [
+    {
+      "entry_id": "VIS-001",
+      "component": "Multi-piece wheel rim assembly - lock ring / side ring",
+      "component_location": null,
+      "condition_summary": "Severe surface corrosion (rust) across entire rim face and lock ring. Orange-brown oxidation covering the majority of the rim bowl and flanges. Lock ring appears seated but corrosion obscures ability to confirm full seating integrity around full circumference. A visible gap or discontinuity is observed at approximately the 2 o'clock position on the lock ring which may indicate improper seating or a break in the ring.",
+      "severity_indication": "Critical",
+      "voice_evidence": null,
+      "vision_evidence": "Severe surface corrosion (rust) across entire rim face and lock ring. Orange-brown oxidation covering the majority of the rim bowl and flanges. Lock ring appears seated but corrosion obscures ability to confirm full seating integrity around full circumference. A visible gap or discontinuity is observed at approximately the 2 o'clock position on the lock ring which may indicate improper seating or a break in the ring.",
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "vision"
+      ],
+      "confidence_score": 0.72
+    },
+    {
+      "entry_id": "VIS-002",
+      "component": "Rim base flange / outer bead seat band",
+      "component_location": null,
+      "condition_summary": "Heavy corrosion and rust accumulation on the outer flange ring. Paint coating largely absent. Flange surface shows pitting consistent with advanced oxidation. Debris and organic material (dirt, vegetation) packed into the rim gutter area between flange and tire bead.",
+      "severity_indication": "Critical",
+      "voice_evidence": null,
+      "vision_evidence": "Heavy corrosion and rust accumulation on the outer flange ring. Paint coating largely absent. Flange surface shows pitting consistent with advanced oxidation. Debris and organic material (dirt, vegetation) packed into the rim gutter area between flange and tire bead.",
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "vision"
+      ],
+      "confidence_score": 0.72
+    },
+    {
+      "entry_id": "VIS-003",
+      "component": "Wheel hub center cap / hub face",
+      "component_location": null,
+      "condition_summary": "CAT yellow paint partially intact on center hub cap. Moderate surface rust and paint degradation visible. Hub cap appears physically present and not deformed. Center dome area retains yellow paint suggesting less exposure than outer rim components.",
+      "severity_indication": "Moderate",
+      "voice_evidence": null,
+      "vision_evidence": "CAT yellow paint partially intact on center hub cap. Moderate surface rust and paint degradation visible. Hub cap appears physically present and not deformed. Center dome area retains yellow paint suggesting less exposure than outer rim components.",
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "vision"
+      ],
+      "confidence_score": 0.72
+    },
+    {
+      "entry_id": "VIS-004",
+      "component": "Wheel mounting studs and lug nuts (bolt circle)",
+      "component_location": null,
+      "condition_summary": "Approximately 20 lug nuts visible in a circular bolt pattern. All appear present on visual count. Heavy corrosion on nut faces with rust staining. Individual nut condition difficult to assess precisely but no obviously missing nuts detected. Corrosion may complicate torque verification.",
+      "severity_indication": "Moderate",
+      "voice_evidence": null,
+      "vision_evidence": "Approximately 20 lug nuts visible in a circular bolt pattern. All appear present on visual count. Heavy corrosion on nut faces with rust staining. Individual nut condition difficult to assess precisely but no obviously missing nuts detected. Corrosion may complicate torque verification.",
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "vision"
+      ],
+      "confidence_score": 0.72
+    },
+    {
+      "entry_id": "VIS-005",
+      "component": "Pneumatic tire (Goodrich/Goodyear - partial lettering visible)",
+      "component_location": null,
+      "condition_summary": "Tire sidewall visible around full circumference in image. No visible sidewall cuts, bulges, or structural deformations observed. Tread pattern partially visible at edges appearing intact. Tire appears inflated based on profile shape. Bead area obscured by rim corrosion and debris.",
+      "severity_indication": "Low",
+      "voice_evidence": null,
+      "vision_evidence": "Tire sidewall visible around full circumference in image. No visible sidewall cuts, bulges, or structural deformations observed. Tread pattern partially visible at edges appearing intact. Tire appears inflated based on profile shape. Bead area obscured by rim corrosion and debris.",
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "vision"
+      ],
+      "confidence_score": 0.72
+    },
+    {
+      "entry_id": "VIS-006",
+      "component": "Rim gutter / bead seat area",
+      "component_location": null,
+      "condition_summary": "Significant debris accumulation including organic material and compacted dirt visible in the rim gutter between tire bead and rim flange. This contamination combined with corrosion compromises bead sealing surface integrity.",
+      "severity_indication": "Moderate",
+      "voice_evidence": null,
+      "vision_evidence": "Significant debris accumulation including organic material and compacted dirt visible in the rim gutter between tire bead and rim flange. This contamination combined with corrosion compromises bead sealing surface integrity.",
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "vision"
+      ],
+      "confidence_score": 0.72
+    }
+  ],
+  "preliminary_status": "STOP",
+  "critical_entry_count": 2,
+  "moderate_entry_count": 3,
+  "requires_technician_review": false,
+  "ai_overview": "Inspection of various components found 2 critical and 3 moderate anomalies. Immediate attention needed for Multi-piece wheel rim assembly - lock ring / side ring: Severe surface corrosion (rust) across entire rim face and lock ring. Orange-brown oxidation covering the majority of the rim bowl and flanges. Lock ring appears seated but corrosion obscures ability to confirm full seating integrity around full circumference. A visible gap or discontinuity is observed at approximately the 2 o'clock position on the lock ring which may indicate improper seating or a break in the ring.. Voice input unavailable. Findings derived solely from visual inference.",
+  "ai_priority_action": "Evaluate all CRITICAL findings before operating.",
+  "documentation_ready": true,
+  "missing_inputs": [
+    "voice_input"
+  ],
+  "downstream_hints": {
+    "report_template": "standard",
+    "escalation_required": true
+  }
+}

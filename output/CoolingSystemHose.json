@@ -1,0 +1,27 @@
+{
+  "context_path": "/outputs/5614f2fc-d139-4ccd-b0fb-fa67a95c737b.json",
+  "inspection_output": {
+    "inspection_summary": {
+      "asset": "CAT D6N Dozer",
+      "status": "fail",
+      "overall_operational_impact": "Machine is not safe for operation. Extensive rust and pitting on the rim structure compromises wheel and mounting surface integrity, posing an immediate risk of rim failure, track dislodgement, or loss of machine control during operation. Immediate shutdown and repair are required before returning the unit to service."
+    },
+    "anomalies": [
+      {
+        "component": "rim",
+        "component_location": "Rim structure and mounting surfaces \u2014 exact side unconfirmed, technician field verification required",
+        "issue": "Extensive Rust and Pitting on Rim Structure",
+        "condition_description": "Technician reports extensive rust and pitting observed across the rim structure, affecting both the structural integrity of the rim body and the mounting surfaces. Degradation of this nature indicates advanced corrosion that may have compromised material thickness, load-bearing capacity, and the sealing or fitment reliability of the rim at its mounting interface. No visual image data was available to corroborate or spatially qualify the reported condition.",
+        "severity": "Critical",
+        "safety_impact_assessment": "Severely corroded rim structures are at elevated risk of sudden fracture or deformation under operational load. A rim failure during dozing operations could result in loss of machine directional control, track separation, or equipment rollover, presenting a high risk of fatal or serious injury to the operator and ground personnel in the vicinity.",
+        "operational_impact": "Compromised rim integrity and degraded mounting surfaces will prevent secure track tensioning and may cause track misalignment or derailment. Machine cannot be safely operated until the rim is inspected in full and replaced as required. Continued operation risks catastrophic undercarriage damage and complete operational failure.",
+        "estimated_timeline": "Replace immediately before next operation",
+        "recommended_action": "Remove machine from service immediately. Perform a full hands-on inspection of the affected rim structure and all mounting surfaces. Replace the rim assembly if material loss, pitting depth, or structural deformation exceeds CAT D6N service tolerance specifications. Do not return the machine to operation until the rim has been replaced and all mounting hardware has been inspected and torqued to specification.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": true,
+        "confidence_score": 95
+      }
+    ]
+  }
+}

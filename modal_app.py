@@ -13,7 +13,10 @@ vol = modal.Volume.from_name("cat-inspector-outputs", create_if_missing=True)
 
 image = modal.Image.debian_slim().apt_install("ffmpeg").pip_install(
     "openai-whisper", "transformers", "torch", "pillow", "accelerate", "pydantic"
-).add_local_dir("cat-inspector/schemas", remote_path="/root/schemas").add_local_dir("cat-inspector/pipeline", remote_path="/root/pipeline")
+).add_local_dir("cat-inspector/schemas", remote_path="/root/schemas"
+).add_local_dir("cat-inspector/pipeline", remote_path="/root/pipeline"
+).add_local_dir("cat-inspector/context_engine", remote_path="/root/context_engine"
+).add_local_dir("cat-inspector/prompts", remote_path="/root/prompts")
 
 D6N_PARTS = {
     "track":         "PT-D6N-TRK-001",
@@ -155,7 +158,7 @@ def transcribe_audio(audio_bytes: bytes) -> str:
             os.remove(tmp_filename)
 
 @app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=60)
-def analyze_image(image_bytes: bytes) -> dict | None:
+def analyze_image(image_bytes: bytes, category: str = "auto") -> dict | None:
     if not image_bytes:
         return None
         
@@ -171,10 +174,52 @@ def analyze_image(image_bytes: bytes) -> dict | None:
         "content-type": "application/json"
     }
 
+    import sys
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from context_engine.subsection_router import SubsectionRouter
+    
+    router = SubsectionRouter()
+    combined_prompt, resolved_category, _ = router.load_subsection_prompt(category)
+    
+    text_instruction = f"""ACTIVE INSPECTION SEGMENT: {resolved_category}
+SEGMENT PRIORITY: Evaluate the image against the segment criteria below.
+
+{combined_prompt}
+
+RESPONSE INSTRUCTIONS:
+Return a single JSON object.
+Each finding MUST include is_global_safety_override: true/false.
+Segment anomalies: is_global_safety_override = false
+Global safety anomalies: is_global_safety_override = true
+
+Do NOT omit global safety findings because they are off-segment.
+Do NOT force-fit global safety components into segment vocabulary.
+
+CRITICAL: 
+- severity_indicator MUST be exactly one of: "CRITICAL", "MODERATE", "LOW", "NORMAL". Do NOT use "UNASSESSABLE".
+- image_quality MUST be exactly one of: "clear", "obstructed", "insufficient_lighting". Do NOT use "low_for_segment".
+
+Respond in JSON only. No markdown. No preamble. No backticks:
+{{
+  "visible_components": ["list of components you can actually see"],
+  "findings": [
+    {{
+      "component": "exact part name",
+      "observation": "precise description of what you see",
+      "severity_indicator": "CRITICAL",
+      "is_global_safety_override": true,
+      "segment_mismatch_flag": true,
+      "global_override_category": "access_egress"
+    }}
+  ],
+  "confidence": 95,
+  "image_quality": "clear"
+}}"""
+
     data = {
         "model": "claude-sonnet-4-6",
         "max_tokens": 1024,
-        "system": VISION_PROMPT,
+        "system": "You are a CAT D6N dozer visual inspection AI. You strictly follow instructions and always return valid JSON without markdown wrapping.",
         "messages": [
             {
                 "role": "user",
@@ -189,7 +234,7 @@ def analyze_image(image_bytes: bytes) -> dict | None:
                     },
                     {
                         "type": "text",
-                        "text": "Analyze this inspection image and strictly follow the output format."
+                        "text": text_instruction
                     }
                 ]
             }
@@ -218,6 +263,10 @@ def analyze_image(image_bytes: bytes) -> dict | None:
             
     except Exception as e:
         print(f"Error in analyze_image: {e}")
+        try:
+            print(f"Raw text was:\n{content_text}")
+        except:
+            pass
         return None
 
 @app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=60)
@@ -292,7 +341,7 @@ def extract_structured_note(transcript: str, vision_data: dict | None) -> dict:
         return {"error": "Failed to extract structured note", "details": str(e)}
 
 @app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], volumes={"/outputs": vol}, timeout=120)
-def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None):
+def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None, component_category: str = "auto"):
     # This runs remotely as the orchestrator.
     # We fork EARS and EYES using Modal's .spawn() to execute them in parallel on separate remote workers
     
@@ -300,7 +349,7 @@ def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None):
     
     eyes_call = None
     if image_bytes is not None and len(image_bytes) > 0:
-        eyes_call = analyze_image.spawn(image_bytes)
+        eyes_call = analyze_image.spawn(image_bytes, component_category)
     
     # Wait for results
     transcript = ears_call.get()
@@ -318,7 +367,7 @@ def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None):
     context = asyncio.run(build_context_bucket(
         raw_transcript=transcript,
         raw_vision=vision_raw,
-        component_category="auto", 
+        component_category=component_category, 
         inspection_type="daily_walkaround"
     ))
     
@@ -335,7 +384,7 @@ def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None):
     }
 
 @app.local_entrypoint()
-def main(audio_path: str = None, image_path: str = None):
+def main(audio_path: str = None, image_path: str = None, category: str = "auto"):
     # The requirement specifically mentions:
     # Exit gate command: modal run modal_app.py
     # so we need a default execution path when no arguments are provided.
@@ -364,7 +413,7 @@ def main(audio_path: str = None, image_path: str = None):
         with open("sample.jpg", "rb") as f:
             image_bytes = f.read()
 
-    print("Submitting digest_maintenance_event task to Modal...")
-    result = digest_maintenance_event.remote(audio_bytes, image_bytes)
+    print(f"Submitting digest_maintenance_event task to Modal for category '{category}'...")
+    result = digest_maintenance_event.remote(audio_bytes, image_bytes, category)
     print("\n--- FINAL JSON RESULT ---")
     print(json.dumps(result, indent=2))

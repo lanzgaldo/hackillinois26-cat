@@ -131,7 +131,9 @@ def run_fusion(
                         evidence_backed=True,
                         technician_review_flag=False,
                         source_perceptors=["voice", "vision"],
-                        confidence_score=max(voice.language_confidence, vision.overall_confidence / 100.0)
+                        confidence_score=max(voice.language_confidence, vision.overall_confidence / 100.0),
+                        is_global_safety_override=finding.is_global_safety_override,
+                        global_override_category=finding.global_override_category
                     ))
                 else:
                     # CONTRADICTION / PARTIAL
@@ -146,7 +148,9 @@ def run_fusion(
                         evidence_backed=False,
                         technician_review_flag=True,
                         source_perceptors=["voice", "vision"],
-                        confidence_score=vision.overall_confidence / 100.0
+                        confidence_score=vision.overall_confidence / 100.0,
+                        is_global_safety_override=finding.is_global_safety_override,
+                        global_override_category=finding.global_override_category
                     ))
                 e_counter += 1
         else:

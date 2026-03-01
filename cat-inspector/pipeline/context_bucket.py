@@ -51,6 +51,7 @@ async def build_context_bucket(
     mod = sum(1 for e in entries if e.severity_indication == "Moderate")
     
     requires_review = any(e.technician_review_flag for e in entries)
+    has_global_override = any(e.is_global_safety_override for e in entries)
 
     context = CanonicalInspectionContext(
         session_id=session_id,
@@ -71,7 +72,8 @@ async def build_context_bucket(
         missing_inputs=missing,
         downstream_hints={
             "report_template": "TA1" if inspection_type == "TA1" else "standard",
-            "escalation_required": crit > 0
+            "escalation_required": crit > 0,
+            "global_safety_override_triggered": has_global_override
         }
     )
 
