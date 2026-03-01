@@ -1,0 +1,288 @@
+# antigravity/antigravity.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# Antigravity by Google — Pipeline Definition
+# Load this file in the Antigravity IDE (VS Code extension) to get:
+#   - Visual pipeline graph
+#   - Step-by-step debugging
+#   - Integrated prompt editor
+#   - Live weight adjustment
+#   - Output diff vs. Pass/Fail examples
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: cat-equipment-inspector
+version: "1.0.0"
+description: >
+  Caterpillar heavy equipment inspection pipeline.
+  Converts inspection images into weighted, confidence-scored JSON
+  anomaly reports using structured CAT-domain prompts.
+
+# ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
+environment:
+  python: "3.11"
+  requirements:
+    - anthropic>=0.25.0
+    - google-cloud-aiplatform>=1.50.0
+    - google-generativeai>=0.5.0
+    - pydantic>=2.0
+    - modal>=0.62.0
+    - pillow>=10.0
+    - requests>=2.31
+
+secrets:
+  - name: ANTHROPIC_API_KEY
+    source: google_secret_manager
+    secret_id: cat-inspector-anthropic-key
+  - name: MODAL_TOKEN
+    source: google_secret_manager
+    secret_id: cat-inspector-modal-token
+  - name: GCP_PROJECT
+    value: your-gcp-project-id
+
+# ─── PIPELINE STEPS ──────────────────────────────────────────────────────────
+pipeline:
+
+  - id: receive_image
+    name: "Image Ingestion"
+    type: input
+    description: >
+      Accept inspection image from upstream system (mobile app, video frame
+      extractor, or manual upload). Store to GCS bucket.
+    inputs:
+      - name: image
+        type: image
+        formats: [jpg, jpeg, png, webp]
+      - name: component_category
+        type: string
+        default: auto
+        enum: [tires_rims, steps_access, cooling, hydraulics, structural, engine, undercarriage, auto]
+      - name: weight_profile
+        type: string
+        default: default
+        enum: [default, safety, audit, field, low_light]
+    outputs:
+      - name: image_gcs_path
+        type: string
+      - name: component_category
+        type: string
+      - name: weight_profile
+        type: string
+
+  - id: route_subsection
+    name: "Subsection Router"
+    type: python
+    module: context_engine.subsection_router
+    function: SubsectionRouter.route
+    description: >
+      Maps component_category → correct subsection prompt file.
+      If category=auto, triggers classify_component first.
+      THIS STEP PREVENTS THE FAIL PROMPT FAILURE MODE:
+        FailPrompt1 loaded cooling prompt for a steps image.
+        This router guarantees the correct domain context is always injected.
+    depends_on: [receive_image]
+    inputs:
+      - from: receive_image.component_category
+    outputs:
+      - name: subsection_prompt_path
+        type: string
+      - name: resolved_category
+        type: string
+
+  - id: build_context
+    name: "Context Builder"
+    type: python
+    module: context_engine.context_builder
+    function: ContextBuilder.build
+    description: >
+      Assembles the complete context package:
+        1. System prompt with weight placeholders substituted
+        2. Subsection prompt (correct domain criteria)
+        3. JSON schema template
+        4. Base64 image
+      This is the FULL CONTEXT passed to the inference model.
+    depends_on: [route_subsection]
+    inputs:
+      - from: receive_image.image_gcs_path
+        as: image_path
+      - from: route_subsection.resolved_category
+        as: component_category
+      - from: receive_image.weight_profile
+    outputs:
+      - name: context_package
+        type: object
+        schema: ContextPackage
+
+  - id: run_inference
+    name: "Modal Inference Worker"
+    type: http_call
+    description: >
+      Sends context package to Modal AI worker for Claude vision inference.
+      Modal handles: GPU scheduling, retries, volume I/O, scaling to zero.
+    depends_on: [build_context]
+    endpoint: "${MODAL_ENDPOINT}"
+    method: POST
+    auth:
+      type: bearer
+      token: "${MODAL_TOKEN}"
+    body:
+      context_package: "${build_context.context_package}"
+    timeout_seconds: 90
+    retry:
+      max_attempts: 3
+      backoff: exponential
+      initial_delay_seconds: 1
+    outputs:
+      - name: raw_model_output
+        type: string
+      - name: inference_success
+        type: boolean
+
+  - id: validate_output
+    name: "Schema Validator"
+    type: python
+    module: context_engine.schema_validator
+    function: SchemaValidator.validate
+    description: >
+      Two-phase validation:
+        Phase 1: Extract JSON from model output (handles markdown fences, preamble)
+        Phase 2: Pydantic validation + auto-correction of derived fields
+                 (weighted scores, counts, operational_status)
+    depends_on: [run_inference]
+    inputs:
+      - from: run_inference.raw_model_output
+        as: raw_text
+      - from: build_context.context_package.weight_vector
+        as: weights
+    outputs:
+      - name: validated_output
+        type: object
+        schema: InspectionOutput
+      - name: corrections
+        type: array
+      - name: validation_success
+        type: boolean
+
+  - id: persist_result
+    name: "BigQuery + Volume Write"
+    type: python
+    module: antigravity.pipeline
+    function: AntigravityPipeline._write_to_bigquery
+    description: >
+      Writes final JSON to:
+        1. Modal output volume (for downstream systems)
+        2. BigQuery (for historical trending + Looker Studio dashboards)
+    depends_on: [validate_output]
+    condition: "${validate_output.validation_success} == true"
+    inputs:
+      - from: validate_output.validated_output
+
+  - id: emit_result
+    name: "API Response"
+    type: output
+    depends_on: [validate_output]
+    outputs:
+      - name: inspection_result
+        schema: InspectionOutput
+      - name: pipeline_metadata
+        type: object
+
+# ─── EVALUATIONS (Antigravity IDE built-in) ────────────────────────────────
+evaluations:
+  - name: pass_fail_alignment
+    description: >
+      Compare pipeline output against known Pass/Fail examples.
+      PASS: output matches PassPrompt1/PassPrompt2 structure and findings.
+      FAIL: output matches FailPrompt1/FailPrompt2 failure modes.
+    fixtures:
+      - id: pass_steps
+        input_image: tests/fixtures/GoodStep.jpg
+        input_category: steps_access
+        expected_schema: tests/expected/pass_steps.json
+        must_not_contain:
+          - component_type: "Coolant"
+          - component_type: "Hydraulic Cylinder Mounting"  # FailPrompt1 false positive
+      - id: pass_rims
+        input_image: tests/fixtures/BrokenRimBolt1.jpg
+        input_category: tires_rims
+        expected_schema: tests/expected/pass_rims.json
+        must_contain:
+          - component_type: "Rim"
+          - severity: "Critical"
+      - id: fail_regression_1
+        description: >
+          Regression test: steps image must NOT produce cooling findings
+          (replicates FailPrompt1 failure mode we must prevent)
+        input_image: tests/fixtures/GoodStep.jpg
+        input_category: steps_access
+        must_not_contain:
+          - component_type: "Cab Glass"
+          - component_type: "Coolant"
+
+  - name: confidence_calibration
+    description: Verify that weighted confidence scores are arithmetically correct
+    checks:
+      - field: confidence_scoring.visual_clarity.weighted
+        formula: visual_clarity.weight * visual_clarity.score
+      - field: confidence_scoring.overall_confidence
+        formula: sum(all_weighted_values)
+      - field: summary.operational_status
+        rules:
+          - if: critical_count > 0 → "STOP"
+          - if: moderate_count > 0 → "CAUTION"
+          - else: "GO"
+
+# ─── WEIGHT PROFILES ──────────────────────────────────────────────────────────
+weight_profiles:
+  default:
+    visual_clarity:    0.35
+    severity_match:    0.30
+    context_alignment: 0.20
+    field_history:     0.15
+  safety:
+    visual_clarity:    0.25
+    severity_match:    0.45
+    context_alignment: 0.20
+    field_history:     0.10
+  audit:
+    visual_clarity:    0.20
+    severity_match:    0.25
+    context_alignment: 0.40
+    field_history:     0.15
+  field:
+    visual_clarity:    0.20
+    severity_match:    0.25
+    context_alignment: 0.20
+    field_history:     0.35
+  low_light:
+    visual_clarity:    0.15
+    severity_match:    0.30
+    context_alignment: 0.35
+    field_history:     0.20
+
+# ─── ANTIGRAVITY IDE SETTINGS ─────────────────────────────────────────────────
+ide:
+  prompt_editor:
+    files:
+      - prompts/system/base_inspector.txt
+      - prompts/subsections/tires_rims.md
+      - prompts/subsections/steps_access.md
+      - prompts/subsections/cooling.md
+      - prompts/subsections/hydraulics.md
+      - prompts/subsections/structural.md
+      - prompts/subsections/engine.md
+      - prompts/subsections/undercarriage.md
+    live_diff: true          # Show diff vs. Pass/Fail examples on save
+    schema_lint: true        # Validate JSON schema template on edit
+
+  weight_editor:
+    live_preview: true       # Recalculate confidence in real-time as sliders move
+    profiles: weight_profiles
+
+  test_runner:
+    fixtures_dir: tests/fixtures/
+    auto_run_on_save: true
+    fail_fast: false
+
+  output_viewer:
+    format: json
+    highlight_anomalies: true
+    show_corrections: true   # Highlight fields that were auto-corrected

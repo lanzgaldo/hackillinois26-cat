@@ -1,0 +1,13 @@
+{
+    "description": "Regression guard. Output from steps_access analysis of GoodStep.jpg must NOT contain any of these component_type values.",
+    "prohibited_component_types": [
+        "Glass",
+        "Mounting System"
+    ],
+    "prohibited_component_locations": [
+        "Cab Glass",
+        "Hydraulic Cylinder Mounting"
+    ],
+    "source_fail_prompt": "FailPrompt1",
+    "failure_mode": "Wrong subsection context loaded. Cooling prompt applied to steps image."
+}

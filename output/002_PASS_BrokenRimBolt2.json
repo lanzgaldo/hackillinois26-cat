@@ -1,0 +1,51 @@
+{
+  "context_path": "/outputs/bf14130e-ea34-4286-bc9f-e8135e24836d.json",
+  "inspection_output": {
+    "inspection_summary": {
+      "asset": "CAT D6N Dozer",
+      "status": "monitor",
+      "overall_operational_impact": "Two moderate anomalies identified on the track frame hub assembly side. Surface corrosion is present across approximately 20 wheel bolt heads with associated paint loss, and significant compacted organic debris is packed around the outer rim perimeter at multiple clock positions. Neither condition presents an immediate structural failure risk at this time, but both require scheduled attention within 50 operating hours or 2 weeks to prevent accelerated corrosion, moisture retention damage to rim flange surfaces, and potential obscured fastener assessment during future inspections. Machine may continue operation with monitoring. No critical conditions detected."
+    },
+    "anomalies": [
+      {
+        "component": "Wheel Hardware \u2014 Rim Bolt Circle Fasteners",
+        "component_location": "Track frame outer face, hub bolt circle \u2014 approximately 20 lug bolt positions visible on the hub assembly",
+        "issue": "Surface rust and oxidation on rim bolt heads with paint loss",
+        "condition_description": "All visible bolt heads in the rim bolt circle exhibit significant surface rust and oxidation. Paint loss is present across the majority of fastener faces, consistent across approximately 20 bolt positions. Corrosion discoloration is uniform and appears primarily surface-level on the exposed fastener heads. No deep pitting, flaking metal, or evidence of structural compromise to the fasteners is definitively visible at inspection resolution. Condition indicates prolonged moisture exposure and inadequate protective coating retention on hardware.",
+        "severity": "Moderate",
+        "safety_impact_assessment": "Surface-corroded fasteners that progress to structural degradation risk bolt shear or loosening under operational load and vibration, which could result in rim or hub instability and pose a personnel safety hazard. At current observed surface-level stage, risk is elevated but not immediate. Fastener torque integrity cannot be confirmed visually and requires physical verification.",
+        "operational_impact": "Compromised fastener condition may mask torque loss or pre-existing loosening. If corrosion advances to thread or shank degradation, fastener integrity and hub retention become unreliable. Continued moisture exposure without intervention will accelerate deterioration, increasing likelihood of unplanned downtime.",
+        "estimated_timeline": "Address within 50 operating hours or 2 weeks",
+        "recommended_action": "Physically inspect and torque-verify all hub bolt circle fasteners to OEM specification. Clean corrosion from bolt heads, treat exposed metal surfaces with corrosion inhibitor, and apply protective coating. Replace any fasteners found with measurable corrosion depth, pitting, or torque anomalies.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 78,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      },
+      {
+        "component": "Rim / Hub Assembly",
+        "component_location": "Track frame outer face, outer rim perimeter between hub flange and track frame face \u2014 debris accumulation observed at approximately 6 o'clock through 9 o'clock and 12 o'clock positions",
+        "issue": "Compacted organic debris accumulation packed at outer rim perimeter retaining moisture against hub flange",
+        "condition_description": "Significant accumulation of compacted organic debris consisting of leaves, dirt, and fibrous material is packed tightly around the outer rim perimeter between the hub flange and the surrounding track frame face. Debris packing is dense and present across multiple clock positions (6 o'clock through 9 o'clock and 12 o'clock). Accumulation density is sufficient to retain moisture continuously against the rim flange surface, creating conditions that will accelerate corrosion of the rim flange and adjacent hub assembly surfaces. Debris also partially obscures full visual inspection of the rim flange edge, preventing complete condition assessment of underlying metal.",
+        "severity": "Moderate",
+        "safety_impact_assessment": "Moisture retention against structural rim and hub flange surfaces accelerates corrosion that can degrade flange material integrity over time. Obscured rim flange edge prevents detection of cracks, deformation, or flange erosion that could lead to unexpected rim or track frame component failure. Long-term unaddressed condition raises personnel safety risk during high-load dozing operations.",
+        "operational_impact": "Continuous moisture contact with rim flange and hub mating surfaces promotes corrosion that may compromise rim seating, hub flange dimensional integrity, and ultimately undercarriage structural reliability. Debris packing also prevents routine visual monitoring of component condition during daily walkaround inspections, reducing early fault detection capability.",
+        "estimated_timeline": "Address within 50 operating hours or 2 weeks",
+        "recommended_action": "Thoroughly clean and remove all compacted debris from the outer rim perimeter and hub flange interface using compressed air and manual extraction as required. Following cleaning, perform a complete visual inspection of the exposed rim flange edge for corrosion, cracks, or deformation. Apply corrosion inhibitor to exposed flange surfaces where warranted.",
+        "part_number": "PT-D6N-UND-006",
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 78,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      }
+    ]
+  }
+}
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/cleanpxe/main/ap-vkKQZdhKiHt2tGBNHhyXbo

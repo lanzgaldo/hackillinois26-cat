@@ -1,0 +1,33 @@
+{
+  "context_path": "/outputs/a49d2989-1b9d-46d1-a69d-adf58a3e4659.json",
+  "inspection_output": {
+    "inspection_summary": {
+      "asset": "CAT D6N Dozer",
+      "status": "pass",
+      "overall_operational_impact": "No critical or moderate anomalies detected during daily walkaround inspection of the steps and access category. All D6N cab entry components \u2014 steps, grab bar, side glass, structural frame, and ground surface below entry \u2014 appear serviceable and within acceptable condition from visual assessment. One segment identification note has been flagged for a foreground wheeled machine component that does not belong to the CAT D6N dozer configuration. Machine is cleared for routine operation pending technician awareness of the segment mismatch note. Findings are derived solely from visual inference with no voice or adapter data available."
+    },
+    "anomalies": [
+      {
+        "component": "Wheeled Machine Tire and Hydraulic Cylinder (Non-D6N Foreground Equipment)",
+        "component_location": "Extreme foreground of inspection image \u2014 not mounted on or part of the CAT D6N dozer",
+        "issue": "Segment Mismatch \u2014 Non-D6N Component Detected in Inspection Frame",
+        "condition_description": "A rubber tire and partial hydraulic cylinder are visible in the extreme foreground of the inspection image. These components do not match the CAT D6N dozer track-type configuration. The visible equipment is consistent with a motor grader or similar wheeled machine present in the background of the inspection area. No fluid leaks, structural damage, or active safety hazards are visible on these foreground components from the current viewing angle. This finding is flagged as a segment mismatch and is included per global safety override protocol to ensure documentation transparency. These components are not attributable to the CAT D6N dozer under inspection.",
+        "severity": "Low",
+        "safety_impact_assessment": "No direct personnel or operator safety risk attributable to the D6N dozer from this observation. The presence of adjacent wheeled equipment in the inspection zone may introduce ambient hazard context if that equipment is unattended or in motion, but no active hazard was observed. Segment mismatch reduces inspection data reliability for this frame.",
+        "operational_impact": "No operational impact on the CAT D6N dozer. These components are not part of the D6N drivetrain, hydraulic, or structural systems. Image framing anomaly may reduce confidence in full coverage of the intended inspection subject.",
+        "estimated_timeline": "Monitor and replace at next scheduled service",
+        "recommended_action": "Re-photograph the CAT D6N dozer steps and access area ensuring the inspection frame is clear of adjacent equipment. Verify the foreground wheeled machine has been separately inspected and logged under its own asset record.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 72,
+        "is_global_safety_override": true,
+        "segment_mismatch_flag": true,
+        "global_override_category": "segment_identification_note"
+      }
+    ]
+  }
+}
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/cleanpxe/main/ap-IsZ3Hc7NMKvpa4qcXTfzCP

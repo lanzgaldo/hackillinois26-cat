@@ -1,0 +1,87 @@
+{
+  "context_path": "/outputs/c2468804-0714-4fa6-a619-b5363a090735.json",
+  "inspection_output": {
+    "inspection_summary": {
+      "asset": "CAT D6N Dozer",
+      "status": "fail",
+      "overall_operational_impact": "Machine is NOT cleared for operation. Three critical anomalies identified on the wheel and rim assembly: extensive rim corrosion compromising structural integrity, heavy corrosion on all wheel bolts with compromised seating surfaces, and a suspected split rim ring separation at the 1-2 o'clock position constituting a catastrophic tire explosion hazard. Do not inflate, deflate, or adjust tire pressure until a qualified technician performs a full physical inspection of the rim ring assembly. Machine must remain out of service until all critical findings are resolved and cleared by a licensed mechanic."
+    },
+    "anomalies": [
+      {
+        "component": "Rim \u2014 Flange and Mounting Surface",
+        "component_location": "Wheel assembly, rim bowl and outer flange ring \u2014 full circumference",
+        "issue": "Extensive Rim Corrosion with Structural Integrity Risk",
+        "condition_description": "Extensive rust corrosion visible across the entire rim flange and mounting surface. Heavy orange-brown oxidation with visible pitting and surface metal degradation across the rim bowl and outer flange ring. Corrosion pattern is consistent with prolonged moisture exposure and extended service without maintenance. Rust discoloration extends uniformly across the rim structure, indicating depth of penetration beyond surface patina. Structural integrity of the rim flange is questionable given the scale and distribution of corrosion.",
+        "severity": "Critical",
+        "safety_impact_assessment": "Severely corroded rim flanges are at risk of sudden structural failure under operating loads, potentially causing catastrophic wheel separation or tire blowout. Risk of serious injury or fatality to operator and nearby personnel.",
+        "operational_impact": "Compromised rim integrity renders the machine unsafe for any grading, dozing, or tramming operations. Continued use risks complete wheel assembly failure, loss of machine control, and secondary equipment damage.",
+        "estimated_timeline": "Replace immediately before next operation",
+        "recommended_action": "Remove wheel assembly from service immediately. Have a qualified technician perform hands-on physical assessment of rim flange wall thickness and pitting depth. Replace rim assembly if pitting or wall thickness degradation exceeds CAT tolerance specifications.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": true,
+        "confidence_score": 85,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      },
+      {
+        "component": "Wheel Bolts \u2014 Lug Nut Assembly",
+        "component_location": "Wheel hub, circular bolt pattern \u2014 all approximately 20 bolts visible",
+        "issue": "Heavy Corrosion on All Wheel Bolts with Compromised Seating Surfaces",
+        "condition_description": "Approximately 20 wheel bolts visible in circular pattern around the hub. All bolts exhibit heavy surface corrosion and rust discoloration. Several bolt heads appear obscured by rust accumulation, making visual torque assessment impossible. No bolts appear visibly missing, however corroded seating surfaces significantly increase the risk of undertorque and loosening under dynamic load. Bolt thread condition and seating face integrity cannot be assessed without mechanical cleaning.",
+        "severity": "Critical",
+        "safety_impact_assessment": "Corroded and potentially undertorqued wheel bolts present a high risk of wheel detachment during operation, posing a direct fatality risk to the operator and ground personnel in proximity to the machine.",
+        "operational_impact": "Wheel bolt integrity cannot be confirmed from visual inspection alone. Any operation risks progressive bolt loosening leading to wheel separation, loss of machine steering and braking function, and potential rollover.",
+        "estimated_timeline": "Replace immediately before next operation",
+        "recommended_action": "Clean all bolt heads and seating surfaces mechanically before any torque verification. Inspect each bolt for thread damage, stretch, or corrosion-induced cross-section reduction. Retorque all bolts to CAT D6N specification or replace any bolt that fails visual or dimensional inspection. Do not operate until all bolts are confirmed serviceable and correctly torqued.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": true,
+        "confidence_score": 85,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      },
+      {
+        "component": "Rim Flange \u2014 Split Ring / Locking Ring",
+        "component_location": "Outer rim flange, approximately 1-2 o'clock position on the rim ring circumference",
+        "issue": "Suspected Split Rim Ring Separation or Deformation \u2014 Catastrophic Hazard",
+        "condition_description": "At approximately the 1-2 o'clock position on the outer rim flange, a visible gap or step discontinuity is present in the rim ring profile. This discontinuity may indicate partial separation or deformation of the outer locking rim ring. Split rim ring separation is a known catastrophic tire explosion hazard per OSHA 29 CFR 1926.600 and CAT safety guidelines. This finding requires immediate physical inspection before any attempt to adjust, inflate, or deflate tire pressure.",
+        "severity": "Critical",
+        "safety_impact_assessment": "A separated or deformed split rim locking ring can eject under tire inflation pressure with lethal force. Risk of fatal injury to any personnel in the trajectory zone of a rim ring ejection event. This hazard is classified as immediately life-threatening and must be treated as such until physically confirmed or ruled out by a qualified technician.",
+        "operational_impact": "Machine is fully grounded pending physical rim ring inspection. Under no circumstances should tire pressure be adjusted, inflated, or deflated until the rim ring is confirmed fully seated and locked. Any pressurized operation with a compromised locking ring risks immediate catastrophic rim and tire failure.",
+        "estimated_timeline": "Replace immediately before next operation",
+        "recommended_action": "Do not approach tire with inflation equipment until a qualified technician physically inspects and confirms the locking ring seating condition. If ring separation or deformation is confirmed, deflate tire using remote inflation equipment or a self-retracting chuck from behind a physical barrier, then disassemble per CAT multi-piece rim disassembly procedure. Replace any deformed or displaced rim ring components before remounting or re-inflating.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": true,
+        "confidence_score": 85,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      },
+      {
+        "component": "Tire \u2014 Goodyear",
+        "component_location": "Wheel assembly, outer sidewall visible",
+        "issue": "Tire Condition Within Normal Parameters \u2014 Limited Assessment Angle",
+        "condition_description": "Goodyear tire visible. Sidewall appears intact with no visible bulging, cuts, or cord exposure from this angle. Tread pattern partially visible on outer sidewall with no obvious tread separation or blowout evidence. Full tread depth assessment is not possible from this side-on angle. No flat or deflation indicators visible.",
+        "severity": "Low",
+        "safety_impact_assessment": "No immediate tire-related safety concerns identified from visible sidewall inspection. Note: tire condition assessment is limited to visible sidewall only. Full tread, inner sidewall, and bead area cannot be assessed until rim-related critical findings are resolved and the wheel is safely dismounted.",
+        "operational_impact": "Tire does not present an independent operational constraint at this time. Full serviceability confirmation must await physical inspection post-resolution of critical rim and bolt findings.",
+        "estimated_timeline": "Monitor and replace at next scheduled service",
+        "recommended_action": "Conduct full 360-degree tire inspection including tread depth measurement, inner sidewall, and bead area condition once the wheel assembly has been safely removed and critical rim findings are resolved by a qualified technician.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 85,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      }
+    ]
+  }
+}
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/cleanpxe/main/ap-BnlNmNAr0cY3zyTgiAOqkV
