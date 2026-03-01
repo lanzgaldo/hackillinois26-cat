@@ -166,6 +166,7 @@ TARGET SCHEMA TO MATCH EXACTLY:
     image=adapter_image,
     gpu="A10G",
     timeout=120,
+    min_containers=1,
     volumes={"/data": adapter_volume},
 )
 def classify_with_adapter(transcript: str) -> dict:
@@ -249,7 +250,7 @@ def classify_with_adapter(transcript: str) -> dict:
         }
 
 
-@app.function(image=image, gpu="T4", timeout=60)
+@app.function(image=image, gpu="T4", timeout=60, min_containers=1)
 def transcribe_audio(audio_bytes: bytes) -> str:
     import whisper
     

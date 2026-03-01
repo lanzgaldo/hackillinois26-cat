@@ -56,6 +56,7 @@ BACKEND = {
     image=adapter_image,
     gpu="A10G",
     timeout=120,
+    min_containers=1,
     volumes={"/data": adapter_volume},
 )
 def classify_with_adapter(transcript: str) -> dict:
@@ -125,7 +126,7 @@ def classify_with_adapter(transcript: str) -> dict:
         }
 
 
-@app.function(image=adapter_image, gpu="A10G", timeout=120, volumes={"/data": adapter_volume})
+@app.function(image=adapter_image, gpu="A10G", timeout=120, min_containers=1, volumes={"/data": adapter_volume})
 @modal.fastapi_endpoint(method="POST")
 def web_classify(item: dict):
     """HTTPS endpoint: Run the fine-tuned adapter classifier.
