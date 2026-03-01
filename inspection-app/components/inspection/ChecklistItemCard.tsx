@@ -9,16 +9,14 @@ import StatusToggle from './StatusToggle';
 import TimelineChipSelector from './TimelineChipSelector';
 import AISuggestionChip from './AISuggestionChip';
 import AttachmentRow from './AttachmentRow';
-import TranscriptReviewSheet from './TranscriptReviewSheet';
 
 interface Props {
     item: ChecklistItem;
 }
 
 export default function ChecklistItemCard({ item }: Props) {
-    const { state, updateItemStatus, updateItemVoiceNote, addItemPhoto, removeItemPhoto } = useInspection();
+    const { state, updateItemStatus, updateItemVoiceNote, updateItemAIContext, addItemPhoto, removeItemPhoto } = useInspection();
     const itemState = state.itemStates[item.id] || { status: null };
-    const [pendingTranscript, setPendingTranscript] = useState<{ text: string } | null>(null);
 
     const handleStatusChange = (status: Status) => {
         updateItemStatus(item.id, status, itemState.timelineEstimate);
@@ -50,6 +48,7 @@ export default function ChecklistItemCard({ item }: Props) {
 
             <AttachmentRow
                 itemId={item.id}
+                itemName={item.name}
                 voiceNoteUri={itemState.voiceNoteUri || null}
                 voiceNoteTranscript={itemState.voiceNoteEditedTranscript || itemState.voiceNoteTranscript || null}
                 photos={itemState.photos || []}
@@ -57,7 +56,12 @@ export default function ChecklistItemCard({ item }: Props) {
                 onVoiceStop={(uri) => updateItemVoiceNote(item.id, uri, null)}
                 onPhotoCapture={(uri) => addItemPhoto(item.id, uri)}
                 onPhotoRemove={(uri) => removeItemPhoto(item.id, uri)}
-                onTranscriptReady={(transcript) => setPendingTranscript({ text: transcript })}
+                onSaveReview={(transcript: string, edited: string | null, aiContext: any) => {
+                    updateItemVoiceNote(item.id, itemState.voiceNoteUri || null, transcript, edited, aiContext);
+                }}
+                onUpdateAIContext={(aiContext: any) => {
+                    if (aiContext) updateItemAIContext(item.id, aiContext);
+                }}
             />
 
             {item.id === 'eng_1' && itemState.status === 'red' && (
@@ -65,24 +69,6 @@ export default function ChecklistItemCard({ item }: Props) {
                     suggestion="Oil level is critically low. Inspect underneath for active leaks."
                     onAccept={() => updateItemStatus(item.id, 'red')}
                     onDismiss={() => { }}
-                />
-            )}
-
-            {pendingTranscript && (
-                <TranscriptReviewSheet
-                    visible={!!pendingTranscript}
-                    itemName={item.name}
-                    initialTranscript={pendingTranscript.text}
-                    onSave={(finalText, wasEdited) => {
-                        updateItemVoiceNote(
-                            item.id,
-                            itemState.voiceNoteUri || null,
-                            pendingTranscript.text,
-                            wasEdited ? finalText : null
-                        );
-                        setPendingTranscript(null);
-                    }}
-                    onCancel={() => setPendingTranscript(null)}
                 />
             )}
         </View>

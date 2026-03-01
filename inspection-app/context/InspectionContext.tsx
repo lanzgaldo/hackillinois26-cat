@@ -26,6 +26,7 @@ export interface InspectionItemState {
     voiceNoteTranscript?: string | null;
     voiceNoteEditedTranscript?: string | null;
     photos?: string[];
+    aiContext?: any | null;
 }
 
 export interface AIReview {
@@ -56,7 +57,8 @@ interface InspectionContextType {
     resetInspection: (assetId: string) => void;
     removePhoto: (itemId: string, photoId: string) => void;
     // New Actions
-    updateItemVoiceNote: (itemId: string, uri: string | null, transcript: string | null, editedTranscript?: string | null) => void;
+    updateItemVoiceNote: (itemId: string, uri: string | null, transcript: string | null, editedTranscript?: string | null, aiContext?: any | null) => void;
+    updateItemAIContext: (itemId: string, aiContext: any | null) => void;
     addItemPhoto: (itemId: string, uri: string) => void;
     removeItemPhoto: (itemId: string, uri: string) => void;
     fetchAiReview: () => Promise<void>;
@@ -160,14 +162,28 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         }));
     };
 
-    const updateItemVoiceNote = (itemId: string, uri: string | null, transcript: string | null, editedTranscript: string | null = null) => {
+    const updateItemVoiceNote = (itemId: string, uri: string | null, transcript: string | null, editedTranscript: string | null = null, aiContext: any | null = null) => {
         setState(prev => {
             const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
             return {
                 ...prev,
                 itemStates: {
                     ...prev.itemStates,
-                    [itemId]: { ...currentItem, voiceNoteUri: uri, voiceNoteTranscript: transcript, voiceNoteEditedTranscript: editedTranscript }
+                    [itemId]: { ...currentItem, voiceNoteUri: uri, voiceNoteTranscript: transcript, voiceNoteEditedTranscript: editedTranscript, aiContext }
+                },
+                isDraft: true,
+            };
+        });
+    };
+
+    const updateItemAIContext = (itemId: string, aiContext: any | null) => {
+        setState(prev => {
+            const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
+            return {
+                ...prev,
+                itemStates: {
+                    ...prev.itemStates,
+                    [itemId]: { ...currentItem, aiContext }
                 },
                 isDraft: true,
             };
@@ -241,6 +257,7 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
             category.items.forEach(item => {
                 const itemState = state.itemStates[item.id];
                 if (itemState) {
+                    const ctx = itemState.aiContext;
                     completed.items.push({
                         id: item.id,
                         name: item.name,
@@ -249,7 +266,12 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
                         voiceNoteTranscript: itemState.voiceNoteTranscript || null,
                         voiceNoteEditedTranscript: itemState.voiceNoteEditedTranscript || null,
                         photos: itemState.photos || [],
-                        timelineEstimate: itemState.timelineEstimate || null
+                        timelineEstimate: itemState.timelineEstimate || null,
+                        aiContext: ctx || null,
+                        aiPreliminaryStatus: ctx?.preliminary_status || null,
+                        globalSafetyOverridePresent: Array.isArray(ctx?.context_entries)
+                            ? ctx.context_entries.some((e: any) => e.severity === 'CRITICAL')
+                            : false
                     });
                 }
             });
@@ -257,10 +279,21 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
 
         const raw = await AsyncStorage.getItem('cat_track_completed_inspections');
         let history: CompletedInspection[] = raw ? JSON.parse(raw) : [];
+
+        let payloadString = JSON.stringify(completed);
+        if (payloadString.length > 1500000) {
+            console.warn("Inspection payload large — stripping vision_raw to save space");
+            completed.items.forEach(item => {
+                if (item.aiContext && item.aiContext.vision_raw) {
+                    delete item.aiContext.vision_raw;
+                }
+            });
+        }
+
         history.unshift(completed);
 
-        if (history.length > 100) {
-            history = history.slice(0, 100);
+        if (history.length > 50) {
+            history = history.slice(0, 50);
         }
 
         await AsyncStorage.setItem('cat_track_completed_inspections', JSON.stringify(history));
@@ -275,7 +308,7 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
     return (
         <InspectionContext.Provider value={{
             state, updateItemStatus, addNote, addPhoto, removePhoto, submitInspection, resetInspection,
-            updateItemVoiceNote, addItemPhoto, removeItemPhoto, fetchAiReview
+            updateItemVoiceNote, updateItemAIContext, addItemPhoto, removeItemPhoto, fetchAiReview
         }}>
             {children}
         </InspectionContext.Provider>

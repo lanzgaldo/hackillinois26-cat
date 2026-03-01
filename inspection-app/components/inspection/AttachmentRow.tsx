@@ -6,8 +6,12 @@ import { Audio } from 'expo-av';
 import { colors } from '../../constants/colors';
 import { typography } from '../../constants/typography';
 
+import { runInspectionAI } from '../../hooks/useInspectionAI';
+import TranscriptReviewSheet from './TranscriptReviewSheet';
+
 interface Props {
     itemId: string;
+    itemName: string;
     voiceNoteUri: string | null;
     voiceNoteTranscript: string | null;
     photos: string[];
@@ -15,11 +19,13 @@ interface Props {
     onVoiceStop: (uri: string | null) => void;
     onPhotoCapture: (uri: string) => void;
     onPhotoRemove: (uri: string) => void;
-    onTranscriptReady: (transcript: string) => void;
+    onSaveReview: (transcript: string, edited: string | null, aiContext: any | null) => void;
+    onUpdateAIContext: (aiContext: any | null) => void;
 }
 
 export default function AttachmentRow({
     itemId,
+    itemName,
     voiceNoteUri,
     voiceNoteTranscript,
     photos,
@@ -27,23 +33,46 @@ export default function AttachmentRow({
     onVoiceStop,
     onPhotoCapture,
     onPhotoRemove,
-    onTranscriptReady
+    onSaveReview,
+    onUpdateAIContext
 }: Props) {
     const [recording, setRecording] = useState<Audio.Recording | null>(null);
     const [fullScreenPhoto, setFullScreenPhoto] = useState<string | null>(null);
 
+    const [isTranscribing, setIsTranscribing] = useState(false);
+    const [transcriptError, setTranscriptError] = useState<string | null>(null);
+    const [showReviewSheet, setShowReviewSheet] = useState(false);
+    const [transcript, setTranscript] = useState("");
+    const [aiContext, setAiContext] = useState<any | null>(null);
+    const [audioUri, setAudioUri] = useState<string | null>(null);
+
+    const handleRecordingStop = async (audioUriToProcess: string) => {
+        setIsTranscribing(true);
+        setTranscriptError(null);
+        setShowReviewSheet(true);
+
+        const result = await runInspectionAI(audioUriToProcess, photos[0] || null, 'auto');
+
+        setIsTranscribing(false);
+
+        if (result.error) {
+            setTranscriptError(result.error);
+            return;
+        }
+
+        setTranscript(result.transcript);
+        setAiContext(result.aiContext);
+    };
+
     const handleVoiceTap = async () => {
         if (recording) {
-            // stop recording
             setRecording(null);
             await recording.stopAndUnloadAsync();
             await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
             const uri = recording.getURI();
             onVoiceStop(uri);
-            // Mock transcription latency
-            setTimeout(() => {
-                onTranscriptReady("This is an AI generated mock transcript for the voice note.");
-            }, 1500);
+            setAudioUri(uri);
+            if (uri) handleRecordingStop(uri);
             return;
         }
 
@@ -79,7 +108,16 @@ export default function AttachmentRow({
         }
         const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
         if (!result.canceled && result.assets.length > 0) {
-            onPhotoCapture(result.assets[0].uri);
+            const uri = result.assets[0].uri;
+            onPhotoCapture(uri);
+
+            // Re-run AI with both inputs for richer context
+            if (audioUri || voiceNoteUri) {
+                const aiRes = await runInspectionAI(audioUri || voiceNoteUri!, uri, 'auto');
+                if (!aiRes.error && aiRes.aiContext) {
+                    onUpdateAIContext(aiRes.aiContext);
+                }
+            }
         }
     };
 
@@ -91,7 +129,15 @@ export default function AttachmentRow({
         }
         const result = await ImagePicker.launchImageLibraryAsync({ quality: 0.7 });
         if (!result.canceled && result.assets.length > 0) {
-            onPhotoCapture(result.assets[0].uri);
+            const uri = result.assets[0].uri;
+            onPhotoCapture(uri);
+
+            if (audioUri || voiceNoteUri) {
+                const aiRes = await runInspectionAI(audioUri || voiceNoteUri!, uri, 'auto');
+                if (!aiRes.error && aiRes.aiContext) {
+                    onUpdateAIContext(aiRes.aiContext);
+                }
+            }
         }
     };
 
@@ -165,6 +211,23 @@ export default function AttachmentRow({
                     {fullScreenPhoto && <Image source={{ uri: fullScreenPhoto }} style={styles.fullImage} resizeMode="contain" />}
                 </View>
             </Modal>
+
+            <TranscriptReviewSheet
+                visible={showReviewSheet}
+                itemName={itemName}
+                transcript={transcript}
+                isLoading={isTranscribing}
+                error={transcriptError}
+                aiContext={aiContext}
+                onSave={(finalText, wasEdited, ctx) => {
+                    onSaveReview(finalText, wasEdited ? finalText : null, ctx);
+                    setShowReviewSheet(false);
+                }}
+                onRetry={() => {
+                    if (audioUri) handleRecordingStop(audioUri);
+                }}
+                onCancel={() => setShowReviewSheet(false)}
+            />
         </View>
     );
 }

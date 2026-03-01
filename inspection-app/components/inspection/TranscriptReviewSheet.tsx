@@ -13,21 +13,25 @@ import { typography } from '../../constants/typography';
 interface Props {
     visible: boolean;
     itemName: string;
-    initialTranscript: string;
-    onSave: (finalText: string, wasEdited: boolean) => void;
+    transcript: string;
+    isLoading: boolean;
+    error: string | null;
+    aiContext: any | null;
+    onSave: (finalText: string, wasEdited: boolean, aiContext: any | null) => void;
+    onRetry?: () => void;
     onCancel: () => void;
 }
 
-export default function TranscriptReviewSheet({ visible, itemName, initialTranscript, onSave, onCancel }: Props) {
+export default function TranscriptReviewSheet({ visible, itemName, transcript, isLoading, error, aiContext, onSave, onRetry, onCancel }: Props) {
     const insets = useSafeAreaInsets();
     const [isEditing, setIsEditing] = useState(false);
-    const [text, setText] = useState(initialTranscript);
+    const [text, setText] = useState(transcript);
     const translateY = useSharedValue(1000);
     const backdropOpacity = useSharedValue(0);
 
     useEffect(() => {
         if (visible) {
-            setText(initialTranscript);
+            setText(transcript);
             setIsEditing(false);
             backdropOpacity.value = withTiming(1, { duration: 300 });
             translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
@@ -37,7 +41,7 @@ export default function TranscriptReviewSheet({ visible, itemName, initialTransc
                 runOnJS(setIsEditing)(false);
             });
         }
-    }, [visible, initialTranscript]);
+    }, [visible, transcript]);
 
     const handleClose = () => {
         Keyboard.dismiss();
@@ -51,7 +55,7 @@ export default function TranscriptReviewSheet({ visible, itemName, initialTransc
         Keyboard.dismiss();
         backdropOpacity.value = withTiming(0, { duration: 200 });
         translateY.value = withTiming(1000, { duration: 200 }, () => {
-            runOnJS(onSave)(text, isEditing);
+            runOnJS(onSave)(text, isEditing, aiContext);
         });
     };
 
@@ -60,7 +64,7 @@ export default function TranscriptReviewSheet({ visible, itemName, initialTransc
             // Cancel edit
             Keyboard.dismiss();
             setIsEditing(false);
-            setText(initialTranscript);
+            setText(transcript);
         } else {
             // Enter edit mode
             setIsEditing(true);
@@ -90,53 +94,71 @@ export default function TranscriptReviewSheet({ visible, itemName, initialTransc
                     <View style={styles.dragHandle} />
 
                     <View style={styles.headerRow}>
-                        <Text style={styles.headerTitle}>AI TRANSCRIPT</Text>
+                        <Text style={styles.headerTitle}>{isLoading ? 'TRANSCRIBING...' : (error ? 'TRANSCRIPTION FAILED' : 'AI TRANSCRIPT')}</Text>
                         <Text style={styles.headerItemName} numberOfLines={1}>{itemName}</Text>
                     </View>
 
-                    <View style={[
-                        styles.textContainer,
-                        isEditing && styles.textContainerEditing
-                    ]}>
-                        {isEditing ? (
-                            <TextInput
-                                style={styles.textInput}
-                                value={text}
-                                onChangeText={setText}
-                                multiline
-                                scrollEnabled
-                                autoFocus
-                                selectionColor={colors.primary}
-                            />
-                        ) : (
-                            <ScrollView style={{ minHeight: 100 }} showsVerticalScrollIndicator={false}>
-                                <Text style={styles.staticText}>{text}</Text>
-                            </ScrollView>
-                        )}
-
-                        {isEditing && (
-                            <Text style={styles.charCount}>{text.length} chars</Text>
-                        )}
-                    </View>
+                    {isLoading ? (
+                        <View style={styles.loadingContainer}>
+                            <Text style={styles.staticText}>Analyzing your voice note...</Text>
+                        </View>
+                    ) : error ? (
+                        <View style={styles.errorContainer}>
+                            <Text style={styles.errorText}>{error}</Text>
+                            <Text style={styles.errorSubText}>Your recording was saved.</Text>
+                        </View>
+                    ) : (
+                        <View style={[
+                            styles.textContainer,
+                            isEditing && styles.textContainerEditing
+                        ]}>
+                            {isEditing ? (
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={text}
+                                    onChangeText={setText}
+                                    multiline
+                                    scrollEnabled
+                                    autoFocus
+                                    selectionColor={colors.primary}
+                                />
+                            ) : (
+                                <ScrollView style={{ minHeight: 100 }} showsVerticalScrollIndicator={false}>
+                                    <Text style={styles.staticText}>{text}</Text>
+                                </ScrollView>
+                            )}
+                            {isEditing && (
+                                <Text style={styles.charCount}>{text.length} chars</Text>
+                            )}
+                        </View>
+                    )}
 
                     <View style={styles.actionsRow}>
-                        <Pressable
-                            style={styles.secondaryButton}
-                            onPress={handleSecondaryAction}
-                            accessibilityRole="button"
-                        >
-                            <Text style={styles.secondaryButtonText}>{isEditing ? 'SAVE' : 'EDIT'}</Text>
-                        </Pressable>
-
-                        <View style={{ width: 12 }} />
-
-                        <Pressable
-                            style={styles.primaryButton}
-                            onPress={isEditing ? handleClose : handlePrimaryAction}
-                            accessibilityRole="button"
-                        >
-                            <Text style={styles.primaryButtonText}>{isEditing ? 'CANCEL' : 'OK'}</Text>
-                        </Pressable>
+                        {isLoading ? (
+                            <Pressable style={styles.secondaryButton} onPress={handleClose} accessibilityRole="button">
+                                <Text style={styles.secondaryButtonText}>CANCEL</Text>
+                            </Pressable>
+                        ) : error ? (
+                            <>
+                                <Pressable style={styles.secondaryButton} onPress={onRetry} accessibilityRole="button">
+                                    <Text style={styles.secondaryButtonText}>RETRY</Text>
+                                </Pressable>
+                                <View style={{ width: 12 }} />
+                                <Pressable style={styles.primaryButton} onPress={() => { setText(""); handlePrimaryAction(); }} accessibilityRole="button">
+                                    <Text style={styles.primaryButtonText}>SAVE WITHOUT AI</Text>
+                                </Pressable>
+                            </>
+                        ) : (
+                            <>
+                                <Pressable style={styles.secondaryButton} onPress={handleSecondaryAction} accessibilityRole="button">
+                                    <Text style={styles.secondaryButtonText}>{isEditing ? 'SAVE' : 'EDIT'}</Text>
+                                </Pressable>
+                                <View style={{ width: 12 }} />
+                                <Pressable style={styles.primaryButton} onPress={isEditing ? handleClose : handlePrimaryAction} accessibilityRole="button">
+                                    <Text style={styles.primaryButtonText}>{isEditing ? 'CANCEL' : 'OK'}</Text>
+                                </Pressable>
+                            </>
+                        )}
                     </View>
                 </Animated.View>
             </KeyboardAvoidingView>
@@ -254,5 +276,32 @@ const styles = StyleSheet.create({
         fontFamily: typography.families.ui,
         fontSize: 15,
         color: '#080808',
+    },
+    loadingContainer: {
+        minHeight: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    errorContainer: {
+        minHeight: 100,
+        justifyContent: 'center',
+        marginBottom: 24,
+        padding: 16,
+        backgroundColor: 'rgba(229, 57, 53, 0.08)',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: colors.statusRed,
+    },
+    errorText: {
+        fontFamily: typography.families.body,
+        fontSize: 16,
+        color: colors.statusRed,
+        marginBottom: 8,
+    },
+    errorSubText: {
+        fontFamily: typography.families.body,
+        fontSize: 14,
+        color: '#888',
     }
 });

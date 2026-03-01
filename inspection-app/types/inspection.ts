@@ -9,6 +9,9 @@ export interface InspectionItem {
     voiceNoteEditedTranscript: string | null;
     photos: string[];
     timelineEstimate: string | null;
+    aiContext: any | null;
+    aiPreliminaryStatus: "STOP" | "CAUTION" | "GO" | null;
+    globalSafetyOverridePresent: boolean;
 }
 
 export interface CompletedInspection {

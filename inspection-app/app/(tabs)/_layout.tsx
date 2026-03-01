@@ -80,12 +80,14 @@ export default function TabLayout() {
                 name="inspections"
                 options={{
                     tabBarLabel: 'INSPECTIONS',
+                    href: '/(tabs)/inspections' as any,
                 }}
             />
             <Tabs.Screen
                 name="reports"
                 options={{
                     tabBarLabel: 'REPORTS',
+                    href: '/(tabs)/reports' as any,
                 }}
             />
         </Tabs>

@@ -156,8 +156,8 @@ export default function AIReviewScreen() {
                     </Pressable>
                 )}
                 <Pressable
-                    style={[styles.fullReportButton, state.isSubmitted && { flex: 1 }]}
-                    onPress={() => router.replace('/inspection/summary')}
+                    style={[styles.fullReportButton, state.isSubmitted ? { flex: 1 } : undefined]}
+                    onPress={() => router.replace('/(tabs)/inspections/summary')}
                     accessibilityRole="button"
                 >
                     <Text style={styles.fullReportText}>VIEW FULL REPORT</Text>
