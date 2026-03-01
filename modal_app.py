@@ -12,13 +12,14 @@ app = modal.App("cat-inspect-ai-sprint1")
 vol = modal.Volume.from_name("cat-inspector-outputs", create_if_missing=True)
 
 # Shared volume where the fine-tuned LoRA adapter lives (written by pipeline.py)
-adapter_volume = modal.Volume.from_name("d6n-training-vault", create_if_missing=False)
+# Volume resolves to the workspace where this app is deployed (lanzgaldo for prod)
+adapter_volume = modal.Volume.from_name("d6n-training-vault", create_if_missing=True)
 ADAPTER_PROD      = "/data/adapters/production/v1"
 BASE_MODEL        = "mistralai/Mistral-7B-Instruct-v0.2"
 MODEL_CACHE_DIR   = "/data/models/mistral-7b"
 
 image = modal.Image.debian_slim().apt_install("ffmpeg").pip_install(
-    "openai-whisper", "transformers", "torch", "pillow", "accelerate", "pydantic"
+    "openai-whisper", "transformers", "torch", "pillow", "accelerate", "pydantic", "fastapi[standard]"
 ).add_local_dir("cat-inspector/schemas", remote_path="/root/schemas"
 ).add_local_dir("cat-inspector/pipeline", remote_path="/root/pipeline"
 ).add_local_dir("cat-inspector/context_engine", remote_path="/root/context_engine"
@@ -431,7 +432,7 @@ def extract_structured_note(canonical_context: str) -> dict:
         print(f"Error in extract_structured_note: {e}")
         return {"error": "Failed to extract structured note", "details": str(e)}
 
-@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], volumes={"/outputs": vol}, timeout=120)
+@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], volumes={"/outputs": vol}, timeout=180)
 def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes | None = None, component_category: str = "auto"):
     # Input validation
     if not audio_bytes:
@@ -445,15 +446,30 @@ def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes | None = Non
         
     transcript = ears_call.get()
     
-    # Spawn adapter classification asynchronously
-    adapter_call = classify_with_adapter.spawn(transcript)
+    # ── Call lanzgaldo's fine-tuned adapter via HTTPS ──
+    # The trained Mistral-7B weights live on lanzgaldo's d6n-training-vault
+    LANZGALDO_CLASSIFY_URL = "https://lanzgaldo--catrack-provider-web-classify.modal.run"
+    adapter_classification = {"severity": None, "rationale": None, "source": "no_adapter"}
+    if transcript and transcript.strip():
+        try:
+            import urllib.request
+            classify_payload = json.dumps({"transcript": transcript}).encode("utf-8")
+            classify_req = urllib.request.Request(
+                LANZGALDO_CLASSIFY_URL,
+                data=classify_payload,
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(classify_req, timeout=90) as resp:
+                adapter_classification = json.loads(resp.read().decode("utf-8"))
+            print(f"Adapter classification from lanzgaldo: {adapter_classification}")
+        except Exception as e:
+            print(f"Adapter call to lanzgaldo failed (non-fatal): {e}")
+            adapter_classification = {"severity": None, "rationale": None, "source": "bridge_error"}
     
     vision_raw = None
     if eyes_call:
         vision_raw = eyes_call.get()
         
-    adapter_classification = adapter_call.get()
-    
     import asyncio
     import sys
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -561,3 +577,84 @@ def batch(audio_dir: str = "./audiotestcases", output: str = "./audiotestcases_r
     error_count   = sum(1 for r in results if "error" in r)
     print(f"PASS: {pass_count}  MONITOR: {monitor_count}  FAIL: {fail_count}  ERROR: {error_count}")
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HTTPS WEB ENDPOINTS — Exposed for cross-workspace bridge from lanzgaldo
+# These run on cleanpxe and are called by the catrack_provider gateway.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=60)
+@modal.fastapi_endpoint(method="POST")
+def web_transcribe(item: dict):
+    """HTTPS endpoint: transcribe audio. Expects {"audio_b64": "..."}"""
+    import base64
+    audio_b64 = item.get("audio_b64", "")
+    if not audio_b64:
+        return {"error": "audio_b64 is required"}
+    audio_bytes = base64.b64decode(audio_b64)
+    transcript = transcribe_audio.remote(audio_bytes)
+    return {"transcript": transcript}
+
+
+@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=120)
+@modal.fastapi_endpoint(method="POST")
+def web_analyze_image(item: dict):
+    """HTTPS endpoint: Claude vision analysis. Expects {"image_b64": "...", "category": "auto"}"""
+    import base64
+    image_b64 = item.get("image_b64", "")
+    category = item.get("category", "auto")
+    if not image_b64:
+        return {"error": "image_b64 is required"}
+    image_bytes = base64.b64decode(image_b64)
+    result = analyze_image.remote(image_bytes, category)
+    return {"vision_result": result}
+
+
+@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], volumes={"/outputs": vol}, timeout=180)
+@modal.fastapi_endpoint(method="POST")
+def web_extract(item: dict):
+    """
+    HTTPS endpoint: Full inspection pipeline.
+    Expects {"audio_b64": "...", "image_b64": "...(optional)", "category": "auto"}
+    Returns the same output as digest_maintenance_event.
+    """
+    import base64
+    audio_b64 = item.get("audio_b64", "")
+    image_b64 = item.get("image_b64")
+    category = item.get("category", "auto")
+    
+    if not audio_b64:
+        return {"error": "audio_b64 is required"}
+    
+    audio_bytes = base64.b64decode(audio_b64)
+    image_bytes = base64.b64decode(image_b64) if image_b64 else None
+    
+    result = digest_maintenance_event.remote(audio_bytes, image_bytes, category)
+    return result
+
+
+@app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=60)
+@modal.fastapi_endpoint(method="POST")
+def web_synthesize(item: dict):
+    """
+    HTTPS endpoint: Stage 3 report synthesis.
+    Expects {"verified_json": {...}}
+    Calls extract_structured_note with the verified context.
+    """
+    verified = item.get("verified_json", {})
+    if not verified:
+        return {"error": "verified_json is required"}
+    report = extract_structured_note.remote(json.dumps(verified))
+    return {"report": report}
+
+
+@app.function(image=image, timeout=10)
+@modal.fastapi_endpoint(method="GET")
+def web_health():
+    """HTTPS health check for the cleanpxe backend."""
+    return {
+        "status": "ok",
+        "workspace": "cleanpxe",
+        "app": "cat-inspect-ai-sprint1",
+        "endpoints": ["web_transcribe", "web_analyze_image", "web_extract", "web_synthesize"]
+    }
