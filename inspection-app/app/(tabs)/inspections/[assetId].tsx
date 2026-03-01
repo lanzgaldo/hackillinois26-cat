@@ -24,7 +24,8 @@ export default function ActiveInspectionScreen() {
 
     const handleSubmit = () => {
         submitInspection();
-        router.replace('/inspections/review');
+        // Temporarily routing to the confirm screen so you can see the new UI
+        router.replace('/(tabs)/inspections/confirm');
     };
 
     return (
