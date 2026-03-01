@@ -1,0 +1,382 @@
+[
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "tires look good no cuts gouges or foreign material",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Based on visual inspection, tires appear free of cuts, gouges, or foreign material. No debris is lodged in tread grooves. Pressure is within specified range.",
+      "recommended_action": "No action required at this time",
+      "component": "Tires",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_34_34 CST 1jwfZwn6fxDt.mp3",
+    "_index": 1
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Tips are showing where. Flag that one for inspection.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "ASAP",
+      "rationale": null,
+      "source": "finetuned_adapter_partial"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_34_45 CST 16LSz2f6ZLEH.mp3",
+    "_index": 2
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "The tilt cylinders and hoses look clean. No leaks.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Based on observation and document review, the tilt cylinders and hoses appear clean and free of leaks.",
+      "recommended_action": "No immediate action required. Monitor for signs of wear or leakage.",
+      "component": "Extracted Component",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_34_58 CST 15obBWhaulF9.mp3",
+    "_index": 3
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_35_11 CST 13Yqve0yPhPf.mp3",
+    "_index": 4,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 71.44 MiB is free. Process 1 has 21.98 GiB memory in use. Of the allocated memory 21.48 GiB is allocated by PyTorch, and 199.94 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Attachment points show minor aware",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": null,
+      "source": "finetuned_adapter_partial"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_35_23 CST 1gPcrFPIfUDl.mp3",
+    "_index": 5
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "The underneath looks pretty dry. There's no pooling. I don't see any leaks.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Based on visual assessment, machine appears dry and free of leaks. No pooling observed.",
+      "recommended_action": "Monitor for signs of fluid loss. Schedule next preventative maintenance check at 100 hours or 30 days, whichever comes first.",
+      "component": "Extracted Component",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_35_35 CST 1oWI4vFWgcie.mp3",
+    "_index": 6
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "There's some noise that we can hear in the transmission during operation. Machine is down.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "ASAP",
+      "rationale": "Based on audio analysis, transmission bearing failure is imminent. Machine must be removed from service immediately.",
+      "recommended_action": "Extract machine from active work area and transport to service facility. Inspect transmission for bearing damage and replace as necessary. Reinstall transmission and refill transmission fluid. Re-inspect audio output to confirm issue resolution.",
+      "component": "Transmission",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_35_45 CST 1auM8Uyi0CMn.mp3",
+    "_index": 7
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_35_58 CST 14CM5knRcSQ6.mp3",
+    "_index": 8,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 97.44 MiB is free. Process 1 has 21.96 GiB memory in use. Of the allocated memory 21.37 GiB is allocated by PyTorch, and 285.05 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_36_06 CST 1onadJfRm490.mp3",
+    "_index": 9,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 27.44 MiB is free. Process 1 has 22.02 GiB memory in use. Of the allocated memory 21.36 GiB is allocated by PyTorch, and 367.51 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_36_22 CST 17B6RE1b00i9.mp3",
+    "_index": 10,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 87.44 MiB is free. Process 1 has 21.96 GiB memory in use. Of the allocated memory 21.43 GiB is allocated by PyTorch, and 231.17 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Dual cone seals show minor seepage",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Soon",
+      "rationale": "Minor seepage indicates a localized leak. Seals will fail completely within 10 hours of operation.",
+      "recommended_action": "Schedule preventative maintenance within the next 24 hours. Replace seals before next job.",
+      "component": "Dual Cone Seals",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_36_33 CST 1hQnjz91HwbC.mp3",
+    "_index": 11
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Hydraulic tank level looks pretty good.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Based on visual assessment, hydraulic tank level appears adequate. No evidence of leaks or significant fluid loss.",
+      "recommended_action": "Monitor hydraulic tank level at next inspection cycle.",
+      "component": "Hydraulic Tank",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_36_41 CST 1lJwvvy9ejx3.mp3",
+    "_index": 12
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Transmission oil is at the correct level.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": null,
+      "source": "finetuned_adapter_partial"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_36_49 CST 1beW5rJ8TQOD.mp3",
+    "_index": 13
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_36_56 CST 1nqSRalJGB0R.mp3",
+    "_index": 14,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 89.44 MiB is free. Process 1 has 21.96 GiB memory in use. Of the allocated memory 21.37 GiB is allocated by PyTorch, and 293.05 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_37_07 CST 158M2iuUUQ14.mp3",
+    "_index": 15,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 27.44 MiB is free. Process 1 has 22.02 GiB memory in use. Of the allocated memory 21.44 GiB is allocated by PyTorch, and 283.76 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Engine oil is within the correct range",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": null,
+      "recommended_action": "Next inspection due in 50 hours",
+      "component": "Engine",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_37_19 CST 1vXmtTPt0jrJ.mp3",
+    "_index": 16
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Coolant is slightly low.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Soon",
+      "rationale": "Coolant level is below the minimum mark on the side of the coolant reservoir. This condition could lead to overheating and engine damage if not addressed soon.",
+      "recommended_action": "Add coolant to the reservoir to the proper level. Check for leaks and address as necessary.",
+      "component": "Engine Cooling System",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_37_58 CST 13pG2TSa35rd.mp3",
+    "_index": 17
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "debris accumulation on radiator cores",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "ASAP",
+      "rationale": "Debris accumulation on radiator cores restricts coolant flow, leading to overheating and potential engine damage.",
+      "recommended_action": "Clean debris from radiator cores with compressed air or soft brush. Inspect for damage and replace if necessary.",
+      "component": "Radiator Cores",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_38_11 CST 18cJ2TiL9HTu.mp3",
+    "_index": 18
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_38_31 CST 18VED3SUuAgM.mp3",
+    "_index": 19,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 67.44 MiB is free. Process 1 has 21.98 GiB memory in use. Of the allocated memory 21.37 GiB is allocated by PyTorch, and 319.94 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_38_39 CST 1g2s1yh1rjso.mp3",
+    "_index": 20,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 63.44 MiB is free. Process 1 has 21.99 GiB memory in use. Of the allocated memory 21.39 GiB is allocated by PyTorch, and 302.99 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_38_56 CST 13widwopUOAZ.mp3",
+    "_index": 21,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 105.44 MiB is free. Process 1 has 21.95 GiB memory in use. Of the allocated memory 21.36 GiB is allocated by PyTorch, and 283.04 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Slight wear on air filter.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Soon",
+      "rationale": "Filter media shows slight discoloration. Replace before media falls apart.",
+      "recommended_action": "Replace air filter element at next maintenance interval.",
+      "component": "Air Filter",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_39_04 CST 12bCOGTZTAFw.mp3",
+    "_index": 22
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Dear Steps and Handrails Fastened",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "ASAP",
+      "rationale": null,
+      "source": "finetuned_adapter_partial"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_39_49 CST 12LsYNTgLnEe.mp3",
+    "_index": 23
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Roll over and following object protection structure intact.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Roll over protection structure is present and undamaged.",
+      "recommended_action": "No immediate action required.",
+      "component": "Roll Over Protection",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_40_00 CST 1eDA2nuTKAWU.mp3",
+    "_index": 24
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_40_09 CST 1f9bMGl3Fx2H.mp3",
+    "_index": 25,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 31.44 MiB is free. Process 1 has 22.02 GiB memory in use. Of the allocated memory 21.37 GiB is allocated by PyTorch, and 351.93 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_40_16 CST 1kUdzKRDK87t.mp3",
+    "_index": 26,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 113.44 MiB is free. Process 1 has 21.94 GiB memory in use. Of the allocated memory 21.30 GiB is allocated by PyTorch, and 344.73 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_40_23 CST 1gmsVXH824wq.mp3",
+    "_index": 27,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 57.44 MiB is free. Process 1 has 21.99 GiB memory in use. Of the allocated memory 21.36 GiB is allocated by PyTorch, and 336.54 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Seat adjusts correctly. No tears or damage.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": null,
+      "recommended_action": "Continue operation.",
+      "component": "Seat",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_40_33 CST 1mfLSTDIbuCH.mp3",
+    "_index": 28
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Seat belt latches retract mounting bolts tight.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "ASAP",
+      "rationale": "Retractor mounting bolts are not tight. Seat belt may not deploy correctly in emergency situation.",
+      "recommended_action": "Inspect and tighten mounting bolts to specification. Replace if damaged or worn.",
+      "component": "Seat Belt Retractor Mounting Bolts",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_40_40 CST 1eQ75XpSEt77.mp3",
+    "_index": 29
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Horn tested, loud and clear.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": null,
+      "source": "finetuned_adapter_partial"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_40_47 CST 1hkSgZfzcrvu.mp3",
+    "_index": 30
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_40_52 CST 13WRBr1BTKu1.mp3",
+    "_index": 31,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 95.44 MiB is free. Process 1 has 21.96 GiB memory in use. Of the allocated memory 21.26 GiB is allocated by PyTorch, and 403.94 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_41_19 CST 1f5XxIzYq8Vu.mp3",
+    "_index": 32,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 11.44 MiB is free. Process 1 has 22.04 GiB memory in use. Of the allocated memory 21.36 GiB is allocated by PyTorch, and 383.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "CAB filter checked. Clean seated correctly.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Filter is clean and seated correctly. No debris or contaminants detected.",
+      "recommended_action": "No action required at present.",
+      "component": "Cab Air Filter",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_41_26 CST 11N1DjKOQO6A.mp3",
+    "_index": 33
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "All gauges reading normally at startup.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": null,
+      "recommended_action": "Monitor for leaks. Replace filter every 50 hours or as needed.",
+      "component": "Extracted Component",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_41_33 CST 1fVhv71kDPxL.mp3",
+    "_index": 34
+  },
+  {
+    "error": "Failed to extract structured note",
+    "details": "HTTP Error 404: Not Found",
+    "raw_transcript": "Cycled all switches, lights, wipers, HVAC, all responding.",
+    "vision_raw": null,
+    "adapter_classification": {
+      "severity": "Okay",
+      "rationale": "Based on observation heuristics, no immediate risk of machine failure.",
+      "recommended_action": "Monitor for next 24 hours.",
+      "component": "Extracted Component",
+      "source": "finetuned_adapter"
+    },
+    "_file": "Vocaroo 28 Feb 2026 23_41_51 CST 1kRoBh7efuDH.mp3",
+    "_index": 35
+  },
+  {
+    "_file": "Vocaroo 28 Feb 2026 23_42_09 CST 1kvRlMcIB7L8.mp3",
+    "_index": 36,
+    "error": "CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 67.44 MiB is free. Process 1 has 21.98 GiB memory in use. Of the allocated memory 21.26 GiB is allocated by PyTorch, and 427.94 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  }
+]
