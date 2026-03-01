@@ -119,15 +119,34 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         return () => clearInterval(interval);
     }, [state.assetId, state.isSubmitted, isLoaded]);
 
+    function getDefaultItemState(): InspectionItemState {
+        return {
+            status: null as any,
+            timelineEstimate: undefined,
+            voiceNoteUri: null,
+            voiceNoteTranscript: null,
+            voiceNoteEditedTranscript: null,
+            photos: [],
+            aiContext: null,
+        };
+    }
+
     const updateItemStatus = (itemId: string, status: Status, timelineEstimate?: string) => {
-        setState(prev => ({
-            ...prev,
-            itemStates: {
-                ...prev.itemStates,
-                [itemId]: { status, timelineEstimate }
-            },
-            isDraft: true,
-        }));
+        setState(prev => {
+            const existing = prev.itemStates[itemId] ?? getDefaultItemState();
+            return {
+                ...prev,
+                itemStates: {
+                    ...prev.itemStates,
+                    [itemId]: {
+                        ...existing,                // ← preserves voiceNoteUri, photos, aiContext, transcripts
+                        status,
+                        timelineEstimate: timelineEstimate ?? existing.timelineEstimate,
+                    }
+                },
+                isDraft: true,
+            };
+        });
     };
 
     const addNote = (itemId: string, text: string, type: 'voice' | 'text') => {
@@ -163,17 +182,23 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         }));
     };
 
-    const updateItemVoiceNote = (itemId: string, uri: string | null, transcript: string | null, editedTranscript: string | null = null, aiContext: any | null = null) => {
+    const updateItemVoiceNote = (itemId: string, uri: string | null | undefined, transcript: string | null | undefined, editedTranscript?: string | null, aiContext?: any | null) => {
         if (uri && state.assetId) {
             storeVoiceNoteUri(state.assetId, itemId, uri);
         }
         setState(prev => {
-            const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
+            const existing = prev.itemStates[itemId] ?? getDefaultItemState();
             return {
                 ...prev,
                 itemStates: {
                     ...prev.itemStates,
-                    [itemId]: { ...currentItem, voiceNoteUri: uri, voiceNoteTranscript: transcript, voiceNoteEditedTranscript: editedTranscript, aiContext }
+                    [itemId]: {
+                        ...existing,
+                        voiceNoteUri: uri !== undefined ? uri : existing.voiceNoteUri,
+                        voiceNoteTranscript: transcript !== undefined ? transcript : existing.voiceNoteTranscript,
+                        voiceNoteEditedTranscript: editedTranscript !== undefined ? editedTranscript : existing.voiceNoteEditedTranscript,
+                        aiContext: aiContext !== undefined ? aiContext : existing.aiContext,
+                    }
                 },
                 isDraft: true,
             };

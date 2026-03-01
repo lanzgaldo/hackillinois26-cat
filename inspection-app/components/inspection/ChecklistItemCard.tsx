@@ -23,7 +23,8 @@ export default function ChecklistItemCard({ item }: Props) {
     };
 
     const handleTimelineSelect = (timeline: string) => {
-        updateItemStatus(item.id, 'yellow', timeline);
+        // preserve current status — don't force-reset to yellow
+        updateItemStatus(item.id, itemState.status ?? 'yellow', timeline);
     };
 
     const expandStyle = useAnimatedStyle(() => {
@@ -53,7 +54,7 @@ export default function ChecklistItemCard({ item }: Props) {
                 voiceNoteTranscript={itemState.voiceNoteEditedTranscript || itemState.voiceNoteTranscript || null}
                 photos={itemState.photos || []}
                 onVoiceStart={() => { }}
-                onVoiceStop={(uri) => updateItemVoiceNote(item.id, uri, null)}
+                onVoiceStop={(uri) => updateItemVoiceNote(item.id, uri, undefined)}
                 onPhotoCapture={(uri) => addItemPhoto(item.id, uri)}
                 onPhotoRemove={(uri) => removeItemPhoto(item.id, uri)}
                 onSaveReview={(transcript: string, edited: string | null, aiContext: any) => {

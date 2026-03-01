@@ -26,7 +26,7 @@ interface InspectionItem {
     id: string;
     name: string;
     status: "green" | "yellow" | "red";
-    aiContext: AiContext | null;
+    aiContext: any | null;
     aiPreliminaryStatus: "STOP" | "CAUTION" | "GO" | null;
     globalSafetyOverridePresent: boolean;
 }
@@ -232,9 +232,41 @@ export default function ConfirmScreen() {
                                 </Text>
                             </>
                         ) : (
-                            <Text style={styles.aiActiveText} numberOfLines={6}>
-                                Preliminary AI insights compiled from {inspectionItems.filter(i => i.aiContext).length} item interactions. Technician overrides take precedence.
-                            </Text>
+                            <>
+                                {inspectionItems
+                                    .filter(i => i.aiContext)
+                                    .flatMap(i => {
+                                        // Support both real API schema (inspection_output.anomalies)
+                                        // and legacy schema (context_entries)
+                                        const output = i.aiContext?.inspection_output ?? i.aiContext;
+                                        const anomalies: any[] = output?.anomalies ?? i.aiContext?.context_entries ?? [];
+                                        return anomalies.map((a: any, idx: number) => ({
+                                            key: `${i.id}-${idx}`,
+                                            component: a.component ?? a.component_location ?? '—',
+                                            severity: a.severity ?? a.severity_indicator ?? 'INFO',
+                                            description: a.condition_description ?? a.observation ?? '',
+                                            timeline: a.estimated_timeline ?? null,
+                                        }));
+                                    })
+                                    .slice(0, 6)
+                                    .map(entry => (
+                                        <View key={entry.key} style={{ marginBottom: 8 }}>
+                                            <Text style={{ color: entry.severity === 'Critical' || entry.severity === 'CRITICAL' ? '#F44336' : entry.severity === 'Moderate' || entry.severity === 'WARNING' ? '#FFCD11' : '#9CA3AF', fontSize: 11, fontWeight: '700', marginBottom: 2 }}>
+                                                {entry.severity.toUpperCase()} · {entry.component}
+                                            </Text>
+                                            <Text style={styles.aiActiveText}>{entry.description}</Text>
+                                            {entry.timeline && (
+                                                <Text style={{ color: '#FFCD11', fontSize: 11, marginTop: 2 }}>⏱ {entry.timeline}</Text>
+                                            )}
+                                        </View>
+                                    ))
+                                }
+                                {inspectionItems.filter(i => i.aiContext).length === 0 && (
+                                    <Text style={styles.aiActiveText}>
+                                        AI analysis complete — no anomalies flagged.
+                                    </Text>
+                                )}
+                            </>
                         )}
                     </View>
 
@@ -268,7 +300,7 @@ export default function ConfirmScreen() {
                     <Text style={styles.footerPrimaryText}>Confirm & Submit</Text>
                 </Pressable>
             </View>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 

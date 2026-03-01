@@ -44,7 +44,8 @@ export default function AttachmentRow({
     const [showReviewSheet, setShowReviewSheet] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [aiContext, setAiContext] = useState<any | null>(null);
-    const [audioUri, setAudioUri] = useState<string | null>(null);
+    // NOTE: audioUri is NOT stored locally — we use the voiceNoteUri prop from InspectionContext
+    //       so the correct URI survives remounts and status changes.
 
     const handleRecordingStop = async (audioUriToProcess: string) => {
         setIsTranscribing(true);
@@ -71,7 +72,6 @@ export default function AttachmentRow({
             await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
             const uri = recording.getURI();
             onVoiceStop(uri);
-            setAudioUri(uri);
             if (uri) handleRecordingStop(uri);
             return;
         }
@@ -111,9 +111,9 @@ export default function AttachmentRow({
             const uri = result.assets[0].uri;
             onPhotoCapture(uri);
 
-            // Re-run AI with both inputs for richer context
-            if (audioUri || voiceNoteUri) {
-                const aiRes = await runInspectionAI(audioUri || voiceNoteUri!, uri, 'auto');
+            // Re-run AI with both voice + new photo for richer context
+            if (voiceNoteUri) {
+                const aiRes = await runInspectionAI(voiceNoteUri, uri, 'auto');
                 if (!aiRes.error && aiRes.aiContext) {
                     onUpdateAIContext(aiRes.aiContext);
                 }
@@ -132,8 +132,8 @@ export default function AttachmentRow({
             const uri = result.assets[0].uri;
             onPhotoCapture(uri);
 
-            if (audioUri || voiceNoteUri) {
-                const aiRes = await runInspectionAI(audioUri || voiceNoteUri!, uri, 'auto');
+            if (voiceNoteUri) {
+                const aiRes = await runInspectionAI(voiceNoteUri, uri, 'auto');
                 if (!aiRes.error && aiRes.aiContext) {
                     onUpdateAIContext(aiRes.aiContext);
                 }
@@ -241,7 +241,7 @@ export default function AttachmentRow({
                     setShowReviewSheet(false);
                 }}
                 onRetry={() => {
-                    if (audioUri) handleRecordingStop(audioUri);
+                    if (voiceNoteUri) handleRecordingStop(voiceNoteUri);
                 }}
                 onCancel={() => setShowReviewSheet(false)}
             />

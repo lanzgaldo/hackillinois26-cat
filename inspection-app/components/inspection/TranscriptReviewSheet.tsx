@@ -61,10 +61,10 @@ export default function TranscriptReviewSheet({ visible, itemName, transcript, i
 
     const handleSecondaryAction = () => {
         if (isEditing) {
-            // Cancel edit
+            // Done editing — exit edit mode but KEEP the edited text
             Keyboard.dismiss();
             setIsEditing(false);
-            setText(transcript);
+            // NOTE: do NOT reset setText(transcript) — we keep what the user typed
         } else {
             // Enter edit mode
             setIsEditing(true);
@@ -151,11 +151,11 @@ export default function TranscriptReviewSheet({ visible, itemName, transcript, i
                         ) : (
                             <>
                                 <Pressable style={styles.secondaryButton} onPress={handleSecondaryAction} accessibilityRole="button">
-                                    <Text style={styles.secondaryButtonText}>{isEditing ? 'SAVE' : 'EDIT'}</Text>
+                                    <Text style={styles.secondaryButtonText}>{isEditing ? 'DONE' : 'EDIT'}</Text>
                                 </Pressable>
                                 <View style={{ width: 12 }} />
-                                <Pressable style={styles.primaryButton} onPress={isEditing ? handleClose : handlePrimaryAction} accessibilityRole="button">
-                                    <Text style={styles.primaryButtonText}>{isEditing ? 'CANCEL' : 'OK'}</Text>
+                                <Pressable style={styles.primaryButton} onPress={handlePrimaryAction} accessibilityRole="button">
+                                    <Text style={styles.primaryButtonText}>{isEditing ? 'SAVE' : 'OK'}</Text>
                                 </Pressable>
                             </>
                         )}

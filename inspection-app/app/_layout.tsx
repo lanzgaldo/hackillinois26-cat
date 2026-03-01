@@ -5,6 +5,7 @@ import { useFonts, Barlow_400Regular, Barlow_500Medium } from '@expo-google-font
 import { BarlowCondensed_700Bold, BarlowCondensed_900Black } from '@expo-google-fonts/barlow-condensed';
 import { ShareTechMono_400Regular } from '@expo-google-fonts/share-tech-mono';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View } from 'react-native';
 import { InspectionProvider } from '../context/InspectionContext';
 import { colors } from '../constants/colors';
@@ -31,22 +32,24 @@ export default function RootLayout() {
     }
 
     return (
-        <SafeAreaProvider>
-            <View style={{ flex: 1 }}>
-                <InspectionProvider>
-                    <Stack
-                        screenOptions={{
-                            headerStyle: { backgroundColor: colors.background },
-                            headerTintColor: colors.textPrimary,
-                            headerShadowVisible: false,
-                            contentStyle: { backgroundColor: colors.background },
-                        }}
-                    >
-                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                        <Stack.Screen name="parts/index" options={{ title: 'Parts Order' }} />
-                    </Stack>
-                </InspectionProvider>
-            </View>
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaProvider>
+                <View style={{ flex: 1 }}>
+                    <InspectionProvider>
+                        <Stack
+                            screenOptions={{
+                                headerStyle: { backgroundColor: colors.background },
+                                headerTintColor: colors.textPrimary,
+                                headerShadowVisible: false,
+                                contentStyle: { backgroundColor: colors.background },
+                            }}
+                        >
+                            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                            <Stack.Screen name="parts/index" options={{ title: 'Parts Order' }} />
+                        </Stack>
+                    </InspectionProvider>
+                </View>
+            </SafeAreaProvider>
+        </GestureHandlerRootView>
     );
 }
