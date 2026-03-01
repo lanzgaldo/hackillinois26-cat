@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 24,
-        paddingBottom: 40,
+        paddingBottom: 80,
     },
     identityBar: {
         marginBottom: 20,
@@ -334,6 +334,7 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         padding: 20,
+        paddingBottom: 80, // tab bar clearance
         gap: 12,
         backgroundColor: '#080808',
         borderTopWidth: 1,

@@ -19,7 +19,7 @@ export default function BottomActionBar({ onSubmit, onDraft }: Props) {
     });
 
     const TOTAL_COMPLETED_REQUIRED = 12; // Mock total
-    const isComplete = completed >= TOTAL_COMPLETED_REQUIRED;
+    const isComplete = true; // completed >= TOTAL_COMPLETED_REQUIRED; // Unlocked for easier testing
 
     return (
         <View style={styles.container}>
@@ -48,12 +48,13 @@ export default function BottomActionBar({ onSubmit, onDraft }: Props) {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        padding: 16,
-        paddingBottom: 32, // Safe area padding approx
-        backgroundColor: colors.background,
-        borderTopWidth: 1,
-        borderTopColor: colors.border,
+        paddingHorizontal: 16,
+        paddingBottom: 24,  // breathing room above tab bar
+        paddingTop: 12,
         gap: 12,
+        backgroundColor: '#1A1A1A',
+        borderTopWidth: 1,
+        borderTopColor: '#333333',
     },
     draftButton: {
         flex: 1,

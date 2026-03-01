@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CATEGORIES, Status } from '../constants/inspectionCategories';
-import { CompletedInspection } from '../types/inspection';
+import { LegacyCompletedInspection } from '../types/inspection';
 import { router } from 'expo-router';
+import { storeVoiceNoteUri } from '../utils/voiceNoteStorage';
 
 export interface InspectionNote {
     id: string;
@@ -163,6 +164,9 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
     };
 
     const updateItemVoiceNote = (itemId: string, uri: string | null, transcript: string | null, editedTranscript: string | null = null, aiContext: any | null = null) => {
+        if (uri && state.assetId) {
+            storeVoiceNoteUri(state.assetId, itemId, uri);
+        }
         setState(prev => {
             const currentItem = prev.itemStates[itemId] || ({ status: null as any } as InspectionItemState);
             return {
@@ -239,7 +243,7 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         fetchAiReview();
 
         // Build Payload
-        const completed: CompletedInspection = {
+        const completed: LegacyCompletedInspection = {
             inspectionId: `INSP-${Date.now()}`,
             inspectorName: 'Megan Tech', // Mock User
             assetId: state.assetId,
@@ -263,6 +267,7 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
                         name: item.name,
                         category: category.name,
                         status: itemState.status as any,
+                        voiceNoteUri: itemState.voiceNoteUri || null,
                         voiceNoteTranscript: itemState.voiceNoteTranscript || null,
                         voiceNoteEditedTranscript: itemState.voiceNoteEditedTranscript || null,
                         photos: itemState.photos || [],
@@ -278,7 +283,7 @@ export function InspectionProvider({ children }: { children: React.ReactNode }) 
         });
 
         const raw = await AsyncStorage.getItem('cat_track_completed_inspections');
-        let history: CompletedInspection[] = raw ? JSON.parse(raw) : [];
+        let history: LegacyCompletedInspection[] = raw ? JSON.parse(raw) : [];
 
         let payloadString = JSON.stringify(completed);
         if (payloadString.length > 1500000) {

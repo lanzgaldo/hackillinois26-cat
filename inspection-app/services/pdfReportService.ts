@@ -1,6 +1,6 @@
 ﻿import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { CompletedInspection, InspectionItem } from '../types/inspection';
+import { LegacyCompletedInspection, InspectionItem } from '../types/inspection';
 import { CATEGORIES } from '../constants/inspectionCategories';
 
 const getStatusColor = (status: string) => {
@@ -28,7 +28,7 @@ const getDuration = (seconds: number) => {
     return `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
 };
 
-const generateBaseHTML = (inspection: CompletedInspection, contentHTML: string) => `
+const generateBaseHTML = (inspection: LegacyCompletedInspection, contentHTML: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -245,7 +245,7 @@ const executePrint = async (html: string) => {
     }
 }
 
-export const generateFormOrderPDF = async (inspection: CompletedInspection) => {
+export const generateFormOrderPDF = async (inspection: LegacyCompletedInspection) => {
     let content = '';
     CATEGORIES.forEach(category => {
         const itemsInCategory = inspection.items.filter(i => CATEGORIES.find(c => c.id === category.id)?.items.map(ci => ci.id).includes(i.id));
@@ -261,7 +261,7 @@ export const generateFormOrderPDF = async (inspection: CompletedInspection) => {
     await executePrint(html);
 };
 
-export const generateSeverityOrderPDF = async (inspection: CompletedInspection) => {
+export const generateSeverityOrderPDF = async (inspection: LegacyCompletedInspection) => {
     let content = '';
 
     const redItems = inspection.items.filter(i => i.status === 'red').sort((a, b) => a.name.localeCompare(b.name));
@@ -290,7 +290,7 @@ export const generateSeverityOrderPDF = async (inspection: CompletedInspection) 
     await executePrint(html);
 };
 
-export const generateSummaryReportPDF = async (inspection: CompletedInspection) => {
+export const generateSummaryReportPDF = async (inspection: LegacyCompletedInspection) => {
     let redCount = 0; let yellowCount = 0; let greenCount = 0; let skipCount = 0;
     inspection.items.forEach(i => {
         if (i.status === 'red') redCount++;
@@ -383,7 +383,7 @@ export const generateSummaryReportPDF = async (inspection: CompletedInspection) 
     await executePrint(html);
 };
 
-export const generateActionableItemsPDF = async (inspection: CompletedInspection) => {
+export const generateActionableItemsPDF = async (inspection: LegacyCompletedInspection) => {
     let content = '';
     const redItems = inspection.items.filter(i => i.status === 'red').sort((a, b) => a.name.localeCompare(b.name));
     const yellowItems = inspection.items.filter(i => i.status === 'yellow').sort((a, b) => a.name.localeCompare(b.name));

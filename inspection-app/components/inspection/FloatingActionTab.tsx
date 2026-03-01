@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         elevation: 8,
         borderWidth: 1,
         borderColor: colors.border,
-        zIndex: 999,
+        zIndex: 5,
     },
     actionButton: {
         width: 56,

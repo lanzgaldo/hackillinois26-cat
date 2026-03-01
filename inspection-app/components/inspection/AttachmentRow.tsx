@@ -183,6 +183,23 @@ export default function AttachmentRow({
                 </Pressable>
             </View>
 
+            {/* PLACEHOLDER: Voice note storage indicator */}
+            {voiceNoteUri ? (
+                <View style={styles.voiceNoteStoredRow}>
+                    <Ionicons name="mic-circle" size={18} color="#FFCD11" />
+                    <Text style={styles.voiceNoteStoredText}>
+                        Voice note captured — queued for AI overview
+                    </Text>
+                </View>
+            ) : (
+                <View style={styles.voiceNoteStoredRow}>
+                    <Ionicons name="mic-circle-outline" size={18} color="#9CA3AF" />
+                    <Text style={styles.voiceNoteEmptyText}>
+                        No voice note stored
+                    </Text>
+                </View>
+            )}
+
             {/* PHOTO PREVIEWS */}
             {photos.length > 0 && (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.previewScroll}>
@@ -318,5 +335,25 @@ const styles = StyleSheet.create({
         right: 24,
         zIndex: 10,
         padding: 8,
+    },
+    voiceNoteStoredRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        backgroundColor: '#242424',
+        borderRadius: 8,
+        marginTop: 10,
+        minHeight: 48, // glove-friendly
+    },
+    voiceNoteStoredText: {
+        fontSize: 14,
+        color: '#FFCD11',
+        fontWeight: '600',
+    },
+    voiceNoteEmptyText: {
+        fontSize: 14,
+        color: '#9CA3AF',
     }
 });

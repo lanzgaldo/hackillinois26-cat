@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { CompletedInspection } from '../../types/inspection';
+import { LegacyCompletedInspection } from '../../types/inspection';
 import { colors } from '../../constants/colors';
 import { typography } from '../../constants/typography';
 import { generateActionableItemsPDF, generateFormOrderPDF, generateSeverityOrderPDF, generateSummaryReportPDF } from '../../services/pdfReportService';
 
-export default function InspectionReceiptCard({ inspection }: { inspection: CompletedInspection }) {
+export default function InspectionReceiptCard({ inspection }: { inspection: LegacyCompletedInspection }) {
 
     const [generating, setGenerating] = useState<string | null>(null);
 

@@ -78,7 +78,7 @@ export default function TranscriptReviewSheet({ visible, itemName, transcript, i
         opacity: backdropOpacity.value
     }));
 
-    if (!visible && translateY.value === 1000) return null;
+    if (!visible) return null;
 
     return (
         <Modal visible={visible} transparent={true} animationType="none" statusBarTranslucent>

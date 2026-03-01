@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 20,
-        paddingBottom: 40,
+        paddingBottom: 80,
     },
     header: {
         fontFamily: typography.families.display,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     },
     footer: {
         padding: 20,
-        paddingBottom: 40,
+        paddingBottom: 80, // tab bar clearance
         borderTopWidth: 1,
         borderTopColor: colors.border,
         backgroundColor: colors.background,

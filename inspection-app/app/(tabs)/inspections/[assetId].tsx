@@ -33,7 +33,7 @@ export default function ActiveInspectionScreen() {
             <View style={styles.container}>
                 <StickyInspectionHeader />
 
-                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     {CATEGORIES.map(category => (
                         <AccordionSection key={category.id} category={category} />
                     ))}
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.background,
     },
     scrollContent: {
-        paddingBottom: 220, // Enough Space for the floating tab and bottom bar
+        paddingBottom: 100, // 64px tab bar + 36px breathing room above footer buttons
+        flexGrow: 1,        // forces the container to fill available height
     }
 });

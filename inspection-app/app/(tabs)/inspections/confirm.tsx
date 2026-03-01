@@ -1,7 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, FlatList, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useInspection } from '../../../context/InspectionContext';
+import { CATEGORIES } from '../../../constants/inspectionCategories';
+import { getAllVoiceNoteUrisForSession, clearVoiceNotesForSession } from '../../../utils/voiceNoteStorage';
+import { VoiceNoteCompilationPayload } from '../../../types/inspection';
 
 // TODO: Replace with actual types from your app context/state
 interface AiContext {
@@ -26,41 +31,76 @@ interface InspectionItem {
     globalSafetyOverridePresent: boolean;
 }
 
-// PLACEHOLDER DATA
-const placeholderItems: InspectionItem[] = [
-    {
-        id: "1",
-        name: "Engine Oil Level",
-        status: "green",
-        aiContext: null,
-        aiPreliminaryStatus: "GO",
-        globalSafetyOverridePresent: false,
-    },
-    {
-        id: "2",
-        name: "Hydraulic System",
-        status: "red",
-        aiContext: null,
-        aiPreliminaryStatus: "STOP",
-        globalSafetyOverridePresent: true,
-    },
-    {
-        id: "3",
-        name: "Tire Pressure",
-        status: "yellow",
-        aiContext: null,
-        aiPreliminaryStatus: "CAUTION",
-        globalSafetyOverridePresent: false,
-    },
-];
-
-// PLACEHOLDER CONSTANTS
-const mockGlobalOverride = true;
-const mockPreliminaryStatus: "STOP" | "CAUTION" | "GO" = "STOP";
-const mockTechnicianReview = true;
-
 export default function ConfirmScreen() {
+    const router = useRouter();
+    const { state, submitInspection } = useInspection();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const shimmerAnim = useRef(new Animated.Value(0.3)).current;
+
+    const [compilationPayload, setCompilationPayload] =
+        useState<VoiceNoteCompilationPayload | null>(null);
+
+    // PLACEHOLDER: sessionId should come from the active inspection session context
+    // TODO: replace with real sessionId from global inspection session store
+    const sessionId = state.assetId || 'PLACEHOLDER_SESSION_ID';
+
+    useEffect(() => {
+        (async () => {
+            const clips = await getAllVoiceNoteUrisForSession(sessionId);
+
+            if (clips.length === 0) return;
+
+            // Assemble the compilation payload — ready for the AI overview POST in next sprint
+            // PLACEHOLDER: items array is stubbed; TODO wire to real InspectionItem list from store
+            const payload: VoiceNoteCompilationPayload = {
+                inspectionId: sessionId,
+                clips: clips.map(({ itemId, uri }) => ({
+                    itemId,
+                    itemName: 'PLACEHOLDER_ITEM_NAME', // TODO: look up real name from item store
+                    voiceNoteUri: uri,
+                    aiPreliminaryStatus: null, // TODO: look up from aiContext for this itemId
+                })),
+            };
+
+            setCompilationPayload(payload);
+        })();
+    }, [sessionId]);
+
+    const inspectionItems: InspectionItem[] = [];
+    let globalSafetyOverride = false;
+    let preliminaryStatus: "STOP" | "CAUTION" | "GO" = "GO";
+    let technicianReview = false;
+    let hasAiContext = false;
+
+    CATEGORIES.forEach(category => {
+        category.items.forEach(itemConfig => {
+            const itemState = state.itemStates[itemConfig.id];
+            if (itemState) {
+                const ctx = itemState.aiContext;
+                if (ctx) hasAiContext = true;
+
+                const aiPreliminaryStatus = ctx?.preliminary_status || null;
+                const isCritical = Array.isArray(ctx?.context_entries)
+                    ? ctx.context_entries.some((e: any) => e.severity === 'CRITICAL')
+                    : false;
+
+                if (isCritical) globalSafetyOverride = true;
+                if (ctx?.technician_review_flag) technicianReview = true;
+
+                if (aiPreliminaryStatus === 'STOP') preliminaryStatus = 'STOP';
+                else if (aiPreliminaryStatus === 'CAUTION' && preliminaryStatus !== 'STOP') preliminaryStatus = 'CAUTION';
+
+                inspectionItems.push({
+                    id: itemConfig.id,
+                    name: itemConfig.name,
+                    status: itemState.status as any,
+                    aiContext: ctx || null,
+                    aiPreliminaryStatus,
+                    globalSafetyOverridePresent: isCritical
+                });
+            }
+        });
+    });
 
     useEffect(() => {
         Animated.loop(
@@ -104,17 +144,41 @@ export default function ConfirmScreen() {
         }
     };
 
+    const handleBack = () => {
+        router.back();
+    };
+
+    const handleConfirm = () => {
+        setIsSubmitting(true);
+        submitInspection();
+
+        // PLACEHOLDER: Global AI overview compilation step — NOT active this sprint.
+        // When the compilation endpoint is ready, replace this block with a real POST.
+        // Payload is already assembled above in compilationPayload state.
+        // After successful POST: call clearVoiceNotesForSession(sessionId)
+        // TODO: POST compilationPayload to compilation endpoint before final submit
+        console.log(
+            '[VoiceNote] Compilation payload ready:',
+            JSON.stringify(compilationPayload, null, 2)
+        );
+
+        router.replace('/(tabs)/inspections/review');
+    };
+
     return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
             {/* 1. Header Bar */}
             <View style={styles.header}>
-                {/* PLACEHOLDER: Navigation back action required */}
-                <Pressable style={styles.backButton}>
+                <Pressable style={styles.backButton} onPress={handleBack}>
                     <Ionicons name="chevron-back" size={28} color="#FFF" />
                 </Pressable>
                 <Text style={styles.headerTitle}>Review & Confirm</Text>
-                <Pressable style={styles.submitButtonDisabled} disabled>
-                    <Text style={styles.submitButtonTextDisabled}>Submit</Text>
+                <Pressable
+                    style={isSubmitting ? styles.submitButtonDisabled : styles.submitButtonActive}
+                    disabled={isSubmitting}
+                    onPress={handleConfirm}
+                >
+                    <Text style={isSubmitting ? styles.submitButtonTextDisabled : styles.submitButtonTextActive}>Submit</Text>
                 </Pressable>
             </View>
 
@@ -124,7 +188,7 @@ export default function ConfirmScreen() {
                     <Text style={styles.aiCardTitle}>AI-Generated Overview</Text>
 
                     {/* CRITICAL OVERRIDE BANNER */}
-                    {mockGlobalOverride && (
+                    {globalSafetyOverride && (
                         <View style={styles.criticalBanner}>
                             <Ionicons name="warning-outline" size={20} color="#FFF" style={styles.criticalIcon} />
                             <Text style={styles.criticalBannerText}>⚠ CRITICAL OVERRIDE</Text>
@@ -132,25 +196,50 @@ export default function ConfirmScreen() {
                     )}
 
                     {/* Preliminary Status Badge */}
-                    <View style={[styles.statusBadge, { borderColor: getStatusColor(mockPreliminaryStatus) }]}>
-                        <Text style={[styles.statusBadgeText, { color: getStatusColor(mockPreliminaryStatus) }]}>
-                            {mockPreliminaryStatus}
+                    <View style={[styles.statusBadge, { borderColor: getStatusColor(preliminaryStatus) }]}>
+                        <Text style={[styles.statusBadgeText, { color: getStatusColor(preliminaryStatus) }]}>
+                            {preliminaryStatus}
                         </Text>
                     </View>
 
-                    {/* Placeholder Animated Text Block */}
-                    {/* PLACEHOLDER: Replace skeleton with actual text when data is loaded */}
+                    {/* PLACEHOLDER: Voice note compilation readiness indicator */}
+                    {compilationPayload && compilationPayload.clips.length > 0 ? (
+                        <View style={styles.compilationBanner}>
+                            <Ionicons name="layers-outline" size={16} color="#FFCD11" />
+                            <Text style={styles.compilationBannerText}>
+                                {compilationPayload.clips.length} voice note
+                                {compilationPayload.clips.length !== 1 ? 's' : ''} queued for AI overview
+                            </Text>
+                            {/* TODO: replace this with a POST to the compilation endpoint on submit */}
+                        </View>
+                    ) : (
+                        <View style={styles.compilationBanner}>
+                            <Ionicons name="layers-outline" size={16} color="#9CA3AF" />
+                            <Text style={styles.compilationBannerTextEmpty}>
+                                No voice notes queued
+                            </Text>
+                        </View>
+                    )}
+
                     <View style={styles.textSkeletonContainer}>
-                        <Animated.View style={[styles.textSkeletonLine, { opacity: shimmerAnim }]} />
-                        <Animated.View style={[styles.textSkeletonLine, { opacity: shimmerAnim }]} />
-                        <Animated.View style={[styles.textSkeletonLine, { opacity: shimmerAnim, width: '80%' }]} />
-                        <Text style={styles.aiPlaceholderText} numberOfLines={4}>
-                            AI summary will appear here after voice and image analysis...
-                        </Text>
+                        {!hasAiContext ? (
+                            <>
+                                <Animated.View style={[styles.textSkeletonLine, { opacity: shimmerAnim }]} />
+                                <Animated.View style={[styles.textSkeletonLine, { opacity: shimmerAnim }]} />
+                                <Animated.View style={[styles.textSkeletonLine, { opacity: shimmerAnim, width: '80%' }]} />
+                                <Text style={styles.aiPlaceholderText} numberOfLines={4}>
+                                    AI summary will appear here after voice and image analysis...
+                                </Text>
+                            </>
+                        ) : (
+                            <Text style={styles.aiActiveText} numberOfLines={6}>
+                                Preliminary AI insights compiled from {inspectionItems.filter(i => i.aiContext).length} item interactions. Technician overrides take precedence.
+                            </Text>
+                        )}
                     </View>
 
                     {/* Technician Review Flag */}
-                    {mockTechnicianReview && (
+                    {technicianReview && (
                         <View style={styles.technicianReviewRow}>
                             <Ionicons name="clipboard-outline" size={20} color="#FFCD11" />
                             <Text style={styles.technicianReviewText}>Technician Review Required</Text>
@@ -161,7 +250,7 @@ export default function ConfirmScreen() {
                 {/* 3. Inspection Items List */}
                 <Text style={styles.listHeader}>Inspection Items</Text>
                 <FlatList
-                    data={placeholderItems}
+                    data={inspectionItems}
                     keyExtractor={(item) => item.id}
                     renderItem={renderItem}
                     contentContainerStyle={styles.listContent}
@@ -171,12 +260,11 @@ export default function ConfirmScreen() {
             </View>
 
             {/* 4. Footer Action Bar */}
-            {/* PLACEHOLDER: Wire up onPress actions */}
             <View style={styles.footer}>
-                <Pressable style={styles.footerSecondaryBtn}>
+                <Pressable style={styles.footerSecondaryBtn} onPress={handleConfirm} disabled={isSubmitting}>
                     <Text style={styles.footerSecondaryText}>Save Without AI</Text>
                 </Pressable>
-                <Pressable style={styles.footerPrimaryBtn}>
+                <Pressable style={styles.footerPrimaryBtn} onPress={handleConfirm} disabled={isSubmitting}>
                     <Text style={styles.footerPrimaryText}>Confirm & Submit</Text>
                 </Pressable>
             </View>
@@ -220,6 +308,17 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: 16,
     },
+    submitButtonActive: {
+        height: 48,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        paddingHorizontal: 8,
+    },
+    submitButtonTextActive: {
+        color: '#FFCD11',
+        fontWeight: '600',
+        fontSize: 16,
+    },
     content: {
         flex: 1,
         padding: 16,
@@ -238,6 +337,28 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         fontWeight: 'bold',
         marginBottom: 16,
+    },
+    compilationBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: '#242424',
+        borderRadius: 8,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
+        marginTop: 12,
+        minHeight: 48,
+    },
+    compilationBannerText: {
+        fontSize: 14,
+        color: '#FFCD11',
+        fontWeight: '600',
+        flex: 1,
+    },
+    compilationBannerTextEmpty: {
+        fontSize: 14,
+        color: '#9CA3AF',
+        flex: 1,
     },
     criticalBanner: {
         flexDirection: 'row',
@@ -283,6 +404,12 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         marginTop: 8,
     },
+    aiActiveText: {
+        color: '#F2F0EB',
+        fontSize: 14,
+        lineHeight: 20,
+        marginTop: 4,
+    },
     technicianReviewRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -307,7 +434,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     listContent: {
-        paddingBottom: 24,
+        paddingBottom: 80,
     },
     itemRow: {
         flexDirection: 'row',
@@ -340,6 +467,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#333',
         backgroundColor: '#1A1A1A',
+        paddingBottom: 80, // tab bar clearance
     },
     footerSecondaryBtn: {
         flex: 1,
