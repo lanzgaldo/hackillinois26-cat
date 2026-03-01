@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment & secrets  — NEVER commit these
+.env
+.env.*
+*.env
+secrets.json
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# JS / Expo (if any frontend files land here)
+node_modules/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Test output & batch results
+audiotestcases_results.json
+*_results.json
+*_report.json
+
+# Model weights (too large for git)
+*.bin
+*.safetensors
+*.pt
+*.ckpt
+
+# OS noise
+.DS_Store
+Thumbs.db

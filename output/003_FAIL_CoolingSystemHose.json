@@ -1,0 +1,51 @@
+{
+  "context_path": "/outputs/4c1c3fc8-6605-4b44-9381-b9305ae9b288.json",
+  "inspection_output": {
+    "inspection_summary": {
+      "asset": "CAT D6N Dozer",
+      "status": "pass",
+      "overall_operational_impact": "No critical or moderate anomalies detected during this daily walkaround inspection of the cooling system. All visible cooling hoses, clamps, and engine bay surfaces are within acceptable operational parameters. Two low-severity items are noted due to limited image visibility preventing full assessment of the coolant reservoir level and radiator core condition. A supplemental front-of-machine inspection is recommended to complete full cooling system evaluation. Machine is cleared for operation pending those secondary checks."
+    },
+    "anomalies": [
+      {
+        "component": "Coolant Reservoir",
+        "component_location": "Engine compartment \u2014 coolant overflow/reservoir tank, exact position obscured from current image angle",
+        "issue": "Coolant reservoir not visible \u2014 level assessment incomplete",
+        "condition_description": "The coolant reservoir was not within the visible field of view captured in this image frame. Coolant level cannot be confirmed as within the acceptable MIN/MAX operating range from this angle. No supplemental voice input or adapter telemetry was available to corroborate level status. All other accessible cooling components evaluated in this session show no signs of coolant loss.",
+        "severity": "Low",
+        "safety_impact_assessment": "Low personnel risk at this stage. If coolant level is below minimum and goes undetected, risk of engine overtemperature during operation increases over time, which could escalate to a safety-relevant condition.",
+        "operational_impact": "If coolant level is deficient, sustained machine operation could result in engine overheating, potential component damage, and unplanned downtime. Current operational impact is indeterminate pending physical level verification.",
+        "estimated_timeline": "Monitor and replace at next scheduled service",
+        "recommended_action": "Physically access and inspect the coolant reservoir cap and sight glass or level markings prior to or immediately following machine startup. Confirm fluid level is within CAT-specified MIN/MAX range and top off with approved CAT DEAC or equivalent coolant if required.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 72,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      },
+      {
+        "component": "Radiator",
+        "component_location": "Front of engine compartment \u2014 radiator core and protective guard assembly, not directly visible from current image angle",
+        "issue": "Radiator core and fin integrity unverifiable from current image angle",
+        "condition_description": "The radiator core face and fin array were not directly visible in the captured image frame. No guard damage or missing guard panel sections were detectable within the observable field of view, but a complete assessment of core fin condition, debris blockage, or physical damage to the core face cannot be made without a supplemental inspection from the front of the machine. Image quality was assessed as obstructed, limiting full radiator evaluation.",
+        "severity": "Low",
+        "safety_impact_assessment": "Minimal immediate personnel risk. Undetected radiator fin damage or blockage could lead to progressive cooling inefficiency; if severe, this may contribute to overtemperature conditions during extended operation in high-ambient or high-load environments.",
+        "operational_impact": "Blocked or damaged radiator fins reduce cooling airflow efficiency, potentially affecting engine temperature regulation under sustained load. Current operational impact is indeterminate pending direct visual access to the radiator core face.",
+        "estimated_timeline": "Monitor and replace at next scheduled service",
+        "recommended_action": "Conduct a supplemental visual inspection of the radiator core from the front of the machine. Inspect fin array for crushing, bending, debris packing, or mud accumulation. If fin blockage exceeds 20% of core surface area, clean with low-pressure air or water per CAT OMM guidelines before returning to operation.",
+        "part_number": "PT-D6N-RAD-012",
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 72,
+        "is_global_safety_override": false,
+        "segment_mismatch_flag": false,
+        "global_override_category": null
+      }
+    ]
+  }
+}
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/cleanpxe/main/ap-1UEZBlKsi4sbgieVv96kWH
