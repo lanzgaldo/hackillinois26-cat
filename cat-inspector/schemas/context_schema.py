@@ -170,6 +170,10 @@ class CanonicalInspectionContext(BaseModel):
     missing_inputs:      list[str] = Field(default_factory=list, description="Any missing sensory inputs required")
     downstream_hints:    dict = Field(default_factory=dict, description="Hint bucket for dynamic UI rendering")
 
+    # ── Overview Output ──
+    ai_overview_text:    Optional[str] = Field(default=None, description="Plain-text technician report from overview_generator.py")
+    overview_path:       Optional[str] = Field(default=None, description="Path to the _overview.txt file on disk")
+
     def to_json(self, indent: int = 2) -> str:
         return self.model_dump_json(indent=indent)
 
