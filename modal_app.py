@@ -11,12 +11,24 @@ import modal
 app = modal.App("cat-inspect-ai-sprint1")
 vol = modal.Volume.from_name("cat-inspector-outputs", create_if_missing=True)
 
+# Shared volume where the fine-tuned LoRA adapter lives (written by pipeline.py)
+adapter_volume = modal.Volume.from_name("d6n-training-vault", create_if_missing=False)
+ADAPTER_PROD      = "/data/adapters/production/v1"
+BASE_MODEL        = "mistralai/Mistral-7B-Instruct-v0.2"
+MODEL_CACHE_DIR   = "/data/models/mistral-7b"
+
 image = modal.Image.debian_slim().apt_install("ffmpeg").pip_install(
     "openai-whisper", "transformers", "torch", "pillow", "accelerate", "pydantic"
 ).add_local_dir("cat-inspector/schemas", remote_path="/root/schemas"
 ).add_local_dir("cat-inspector/pipeline", remote_path="/root/pipeline"
 ).add_local_dir("cat-inspector/context_engine", remote_path="/root/context_engine"
 ).add_local_dir("cat-inspector/prompts", remote_path="/root/prompts")
+
+# Heavier image used by the fine-tuned model inference function
+adapter_image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .pip_install(["torch", "transformers", "peft", "accelerate", "bitsandbytes"])
+)
 
 D6N_PARTS = {
     "track":         "PT-D6N-TRK-001",
@@ -77,20 +89,17 @@ Respond in JSON only. No markdown. No preamble. No backticks:
 DIGESTION_PROMPT_TEMPLATE = """You are a licensed CAT D6N dozer inspection AI generating a professional
 inspection report that matches CAT Inspect documentation standards.
 
-Technician voice note:
-'{transcript}'
-
-{vision_text}
+Here is the fully pre-computed Canonical Inspection Context from the AI Fusion Layer:
+{canonical_context}
 
 Known D6N part numbers: {KNOWN_PARTS}
 
 FUSION RULES:
-- Voice and vision describe SAME component + SAME problem
-    → set evidence_backed: true
-- Voice and vision describe SAME component but DIFFERENT findings
-    → set technician_review_required: true
-- Voice only, no vision data
-    → process transcript, set evidence_backed: false
+- The Context Bucket has already resolved overlapping components and conflicts.
+- Format the final InspectionOutput matching the JSON schema EXACTLY.
+- Do NOT alter severity ratings from the pre-computed contexts.
+- Pass through the `is_global_safety_override`, `segment_mismatch_flag`, `global_override_category`, and `evidence_backed` properties.
+- CRITICAL: If a finding in the context has `is_global_safety_override=True`, you MUST include it in the final anomalies array, even if the inferred severity is 'Normal'.
 
 SEVERITY RULES (use CAT's exact language):
 - 'Critical'  = immediate shutdown, do not operate
@@ -136,10 +145,108 @@ TARGET SCHEMA TO MATCH EXACTLY:
       "part_number": "string — from D6N lookup or null",
       "evidence_backed": boolean,
       "technician_review_required": boolean,
-      "confidence_score": integer 0-100
+      "confidence_score": integer 0-100,
+      "is_global_safety_override": boolean,
+      "segment_mismatch_flag": boolean,
+      "global_override_category": "string or null"
     }
   ]
 }"""
+
+
+# ---------------------------------------------------------------------------
+# FINE-TUNED ADAPTER CLASSIFIER
+# Loads the LoRA adapter trained by pipeline.py from the shared Modal Volume.
+# Returns a severity pre-classification (ASAP / Soon / Okay) from the
+# fine-tuned Mistral-7B model. This is injected into Claude's prompt as a
+# domain-grounded signal, improving severity accuracy for CAT D6N findings.
+# ---------------------------------------------------------------------------
+@app.function(
+    image=adapter_image,
+    gpu="A10G",
+    timeout=120,
+    volumes={"/data": adapter_volume},
+)
+def classify_with_adapter(transcript: str) -> dict:
+    import os
+    import gc
+    import torch
+    import json
+    import re
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+    from peft import PeftModel
+
+    # Prevent VRAM fragmentation between sequential calls
+    os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
+
+    # Check if a production adapter actually exists yet
+    if not os.path.exists(ADAPTER_PROD):
+        return {"severity": None, "rationale": None, "source": "no_adapter"}
+
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_compute_dtype=torch.float16,
+    )
+
+    base = AutoModelForCausalLM.from_pretrained(
+        BASE_MODEL,
+        quantization_config=bnb_config,
+        device_map="auto",
+        cache_dir=MODEL_CACHE_DIR,
+    )
+    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, cache_dir=MODEL_CACHE_DIR)
+    model = PeftModel.from_pretrained(base, ADAPTER_PROD)
+    model.eval()
+
+    prompt = (
+        "You are a CAT-certified D6N Track-Type Dozer technician and field inspector. "
+        "You have memorized the D6N service manuals, parts reference guide, and fluid specifications.\n\n"
+        "Given a field observation about the machine and a relevant excerpt from the service "
+        "documentation, analyze the issue and output a structured JSON inspection finding with a "
+        "severity rating of ASAP, Soon, or Okay.\n\n"
+        f"OBSERVATION: {transcript}\n\nOutput JSON:"
+    )
+
+    inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=256,
+            do_sample=False,
+            temperature=1.0,
+            pad_token_id=tokenizer.eos_token_id,
+        )
+    generated = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+
+    # Free VRAM aggressively before returning — prevents OOM on next invocation
+    del inputs, outputs, model, base
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    # Parse the severity from the model output
+    try:
+        clean = generated.strip()
+        if clean.count("{") > clean.count("}"):
+            clean += "}" * (clean.count("{") - clean.count("}"))
+        pred = json.loads(clean)
+        return {
+            "severity": pred.get("severity"),
+            "rationale": pred.get("rationale"),
+            "recommended_action": pred.get("recommended_action"),
+            "component": pred.get("component"),
+            "source": "finetuned_adapter",
+        }
+    except Exception:
+        # Regex fallback if JSON is still malformed
+        sev = re.search(r'"severity"\s*:\s*"(ASAP|Soon|Okay)"', generated)
+        return {
+            "severity": sev.group(1) if sev else None,
+            "rationale": None,
+            "source": "finetuned_adapter_partial",
+        }
+
 
 @app.function(image=image, gpu="T4", timeout=60)
 def transcribe_audio(audio_bytes: bytes) -> str:
@@ -150,7 +257,7 @@ def transcribe_audio(audio_bytes: bytes) -> str:
         tmp_filename = tmp_file.name
         
     try:
-        model = whisper.load_model("base")
+        model = whisper.load_model("small")  # 'small' >> 'base' for technical vocabulary
         result = model.transcribe(tmp_filename)
         return result["text"].strip()
     finally:
@@ -218,7 +325,7 @@ Respond in JSON only. No markdown. No preamble. No backticks:
 
     data = {
         "model": "claude-sonnet-4-6",
-        "max_tokens": 1024,
+        "max_tokens": 4096,
         "system": "You are a CAT D6N dozer visual inspection AI. You strictly follow instructions and always return valid JSON without markdown wrapping.",
         "messages": [
             {
@@ -270,7 +377,7 @@ Respond in JSON only. No markdown. No preamble. No backticks:
         return None
 
 @app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], timeout=60)
-def extract_structured_note(transcript: str, vision_data: dict | None) -> dict:
+def extract_structured_note(canonical_context: str) -> dict:
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         raise ValueError("ANTHROPIC_API_KEY secret not found.")
@@ -281,28 +388,12 @@ def extract_structured_note(transcript: str, vision_data: dict | None) -> dict:
         "content-type": "application/json"
     }
     
-    vision_text = ""
-    if vision_data:
-        v_components = vision_data.get('visible_components', [])
-        v_findings = vision_data.get('findings', [])
-        v_quality = vision_data.get('image_quality', 'unknown')
-        v_conf = vision_data.get('confidence', 0)
-        
-        vision_text = f'''Visual inspection confirmed:
-  Components seen: {v_components}
-  Visual findings: {v_findings}
-  Image quality: {v_quality}
-  Vision confidence: {v_conf}%'''
-    else:
-        vision_text = "No vision data available."
-
-    prompt = DIGESTION_PROMPT_TEMPLATE.replace("{transcript}", transcript)
-    prompt = prompt.replace("{vision_text}", vision_text)
+    prompt = DIGESTION_PROMPT_TEMPLATE.replace("{canonical_context}", canonical_context)
     prompt = prompt.replace("{KNOWN_PARTS}", json.dumps(D6N_PARTS))
 
     data = {
         "model": "claude-sonnet-4-6",
-        "max_tokens": 2048,
+        "max_tokens": 4096,
         "system": "You respond in valid JSON only.",
         "messages": [
             {
@@ -341,50 +432,52 @@ def extract_structured_note(transcript: str, vision_data: dict | None) -> dict:
         return {"error": "Failed to extract structured note", "details": str(e)}
 
 @app.function(image=image, secrets=[modal.Secret.from_name("anthropic-secret")], volumes={"/outputs": vol}, timeout=120)
-def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes = None, component_category: str = "auto"):
-    # This runs remotely as the orchestrator.
-    # We fork EARS and EYES using Modal's .spawn() to execute them in parallel on separate remote workers
-    
+def digest_maintenance_event(audio_bytes: bytes, image_bytes: bytes | None = None, component_category: str = "auto"):
+    # Input validation
+    if not audio_bytes:
+        raise ValueError("Audio missing for inference.")
+        
     ears_call = transcribe_audio.spawn(audio_bytes)
-    
+
     eyes_call = None
     if image_bytes is not None and len(image_bytes) > 0:
         eyes_call = analyze_image.spawn(image_bytes, component_category)
-    
-    # Wait for results
+        
     transcript = ears_call.get()
+    
+    # Spawn adapter classification asynchronously
+    adapter_call = classify_with_adapter.spawn(transcript)
     
     vision_raw = None
     if eyes_call:
         vision_raw = eyes_call.get()
         
+    adapter_classification = adapter_call.get()
+    
     import asyncio
     import sys
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from pipeline.context_bucket import build_context_bucket, write_context_json
     
-    # NEW: Route outputs through context bucket
     context = asyncio.run(build_context_bucket(
         raw_transcript=transcript,
         raw_vision=vision_raw,
-        component_category=component_category, 
+        raw_adapter=adapter_classification,
+        adapter_version="v1",
+        component_category=component_category,
         inspection_type="daily_walkaround"
     ))
     
-    # NEW: Write to output/ directory
     context_path = write_context_json(context, output_dir="/outputs")
+    final_output = extract_structured_note.remote(context.model_dump_json())
     
-    # EXPANDED: Pass canonical context JSON to digestion
-    final_output = extract_structured_note.remote(context.model_dump_json(), None)
-    
-    # EXPANDED: Return both context path and InspectionOutput
     return {
         "context_path": context_path,
         "inspection_output": final_output
     }
 
 @app.local_entrypoint()
-def main(audio_path: str = None, image_path: str = None, category: str = "auto"):
+def main(audio_path: str | None = None, image_path: str | None = None, category: str = "auto"):
     # The requirement specifically mentions:
     # Exit gate command: modal run modal_app.py
     # so we need a default execution path when no arguments are provided.
@@ -417,3 +510,54 @@ def main(audio_path: str = None, image_path: str = None, category: str = "auto")
     result = digest_maintenance_event.remote(audio_bytes, image_bytes, category)
     print("\n--- FINAL JSON RESULT ---")
     print(json.dumps(result, indent=2))
+
+
+@app.local_entrypoint()
+def batch(audio_dir: str = "./audiotestcases", output: str = "./audiotestcases_results.json"):
+    """
+    Process all MP3s in audio_dir through the full pipeline.
+    Usage: modal run modal_app.py::batch
+           modal run modal_app.py::batch --audio-dir ./audiotestcases
+    """
+    mp3_files = sorted([
+        f for f in os.listdir(audio_dir)
+        if f.lower().endswith(".mp3")
+    ])
+    print(f"Found {len(mp3_files)} audio files in {audio_dir}\n")
+
+    results = []
+    for i, filename in enumerate(mp3_files):
+        filepath = os.path.join(audio_dir, filename)
+        print(f"[{i+1}/{len(mp3_files)}] {filename}")
+        with open(filepath, "rb") as f:
+            audio_bytes = f.read()
+        try:
+            result = digest_maintenance_event.remote(audio_bytes, None)
+            result["_file"] = filename
+            result["_index"] = i + 1
+            results.append(result)
+
+            summary     = result.get("inspection_summary", {})
+            status      = summary.get("status", "?").upper()
+            adapter_sev = (result.get("adapter_classification") or {}).get("severity", "N/A")
+            anomalies   = len(result.get("anomalies", []))
+            transcript  = result.get("raw_transcript", "")[:75]
+            print(f"  Status: {status:<8} Adapter: {adapter_sev:<5} Anomalies: {anomalies}  \"{transcript}\"")
+        except Exception as e:
+            print(f"  ERROR: {e}")
+            results.append({"_file": filename, "_index": i + 1, "error": str(e)})
+
+    with open(output, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+
+    print(f"\n{'='*60}")
+    print(f"Complete. {len(results)} results → {output}")
+    print(f"{'='*60}\n")
+
+    # Summary table
+    pass_count    = sum(1 for r in results if r.get("inspection_summary", {}).get("status") == "pass")
+    monitor_count = sum(1 for r in results if r.get("inspection_summary", {}).get("status") == "monitor")
+    fail_count    = sum(1 for r in results if r.get("inspection_summary", {}).get("status") == "fail")
+    error_count   = sum(1 for r in results if "error" in r)
+    print(f"PASS: {pass_count}  MONITOR: {monitor_count}  FAIL: {fail_count}  ERROR: {error_count}")
+

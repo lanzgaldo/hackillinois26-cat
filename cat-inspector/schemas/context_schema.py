@@ -51,6 +51,22 @@ class NormalizedVisionContext(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────
+# MODEL 2.5 — NormalizedAdapterContext
+# ─────────────────────────────────────────────────────────────
+
+class NormalizedAdapterContext(BaseModel):
+    """
+    Validated output from the local Mistral-7B adapter.
+    """
+    raw_prediction:        str = Field(..., description="The raw string output from the adapter")
+    mapped_severity:       Literal["Critical", "Moderate", "Normal", "Unknown"] = Field(..., description="Mapped severity from prediction")
+    confidence:            float = Field(..., ge=0.0, le=1.0, description="Adapter certainty score")
+    anomalous_condition:   Optional[str] = Field(default=None, description="Extracted condition string if available")
+    source:                Literal["adapter", "no_adapter"] = Field(default="adapter", description="Source identifier or fallback")
+
+
+
+# ─────────────────────────────────────────────────────────────
 # MODEL 3 — FusionResult
 # ─────────────────────────────────────────────────────────────
 
@@ -61,17 +77,20 @@ class FusionResult(BaseModel):
     """
     fusion_status: Literal[
         "full_agreement",      # voice + vision identify same component + condition
+        "three_way_agreement", # voice + vision + adapter all agree
         "partial_agreement",   # same component, different severity or condition
         "conflict",            # contradicting findings on same component
-        "voice_only",          # no image provided or image insufficient quality
-        "vision_only",         # audio failed or no voice input
+        "adapter_conflict",    # adapter strongly disagrees with voice/vision
+        "adapter_override",    # adapter provided the only viable signal
+        "voice_only",          # no image/adapter provided or image insufficient quality
+        "vision_only",         # audio failed or no voice input, no adapter
         "independent"          # voice and vision found different components
     ] = Field(..., description="The agreement categorization between modal sensors")
     
     agreement_score:       float = Field(..., ge=0.0, le=1.0, description="Metric of synergy between the voice and vision findings")
     reconciled_components: list[str] = Field(default_factory=list, description="Components correctly identified by both modalities")
     conflict_components:   list[str] = Field(default_factory=list, description="Components where voice and vision actively disagree")
-    dominant_source:       Literal["voice", "vision", "equal", "none"] = Field(..., description="Which input carried the highest confidence or detail")
+    dominant_source:       Literal["voice", "vision", "adapter", "equal", "none"] = Field(..., description="Which input carried the highest confidence or detail")
     fusion_notes:          str = Field(..., description="Plain-language summary of how the fusion engine resolved the match")
 
 
@@ -92,9 +111,11 @@ class ContextBucketEntry(BaseModel):
     severity_indication:    Literal["Critical", "Moderate", "Low", "Normal"] = Field(..., description="Predicted fusion severity")
     voice_evidence:         Optional[str] = Field(default=None, description="Evidence derived from STT")
     vision_evidence:        Optional[str] = Field(default=None, description="Evidence derived from Vision")
-    evidence_backed:        bool = Field(..., description="True if both modalities agree on the finding")
+    adapter_evidence:       Optional[str] = Field(default=None, description="Evidence derived from Adapter")
+    adapter_severity:       Optional[str] = Field(default=None, description="Severity mapped directly from adapter")
+    evidence_backed:        bool = Field(..., description="True if multiple modalities agree on the finding")
     technician_review_flag: bool = Field(..., description="True if a conflict exists needing manual intervention")
-    source_perceptors:      list[Literal["voice", "vision"]] = Field(default_factory=list, description="Which sensors spawned this entry")
+    source_perceptors:      list[Literal["voice", "vision", "adapter"]] = Field(default_factory=list, description="Which sensors spawned this entry")
     confidence_score:       float = Field(..., ge=0.0, le=1.0, description="Composite final confidence in the finding")
     is_global_safety_override: bool = Field(default=False, description="True when entry originates from Global Safety Clause")
     global_override_category: Optional[str] = Field(default=None, description="Which global safety category triggered this entry")
@@ -125,6 +146,8 @@ class CanonicalInspectionContext(BaseModel):
     # ── Perceptor Outputs ──
     voice_context:       Optional[NormalizedVoiceContext] = Field(default=None, description="Validated Whisper data structure")
     vision_context:      Optional[NormalizedVisionContext] = Field(default=None, description="Validated Claude vision structure")
+    adapter_context:     Optional[NormalizedAdapterContext] = Field(default=None, description="Validated Mistral adapter structure")
+    adapter_version:     Optional[str] = Field(default=None, description="Mistral Lora Checkpoint version")
 
     # ── Fusion Layer ──
     fusion_result:       FusionResult = Field(..., description="Orchestration outcomes between the perceptions")

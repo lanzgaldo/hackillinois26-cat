@@ -3,12 +3,14 @@ import os
 from datetime import datetime, timezone
 from typing import Optional, Literal
 from schemas.context_schema import CanonicalInspectionContext
-from pipeline.perceptor_normalizer import normalize_voice, normalize_vision
+from pipeline.perceptor_normalizer import normalize_voice, normalize_vision, normalize_adapter
 from pipeline.fusion_engine import run_fusion, _derive_preliminary_status, _generate_ai_overview
 
 async def build_context_bucket(
     raw_transcript: Optional[str] = None,
     raw_vision: Optional[dict] = None,
+    raw_adapter: Optional[dict] = None,
+    adapter_version: Optional[str] = None,
     component_category: str = "auto",
     inspection_type: Literal["daily_walkaround", "safety", "TA1", "custom"] = "daily_walkaround",
     session_id: Optional[str] = None,
@@ -40,8 +42,17 @@ async def build_context_bucket(
         print(f"[context_bucket] Vision normalization failed: {e}")
         missing.append("image_input")
 
+    a_context = None
+    try:
+        a_context = normalize_adapter(raw_adapter)
+        if not a_context:
+            missing.append("adapter_input")
+    except Exception as e:
+        print(f"[context_bucket] Adapter normalization failed: {e}")
+        missing.append("adapter_input")
+
     # ── 2. Run Fusion Engine ──
-    fusion, entries = run_fusion(v_context, vi_context)
+    fusion, entries = run_fusion(v_context, vi_context, a_context)
 
     # ── 3. Build Canonical Context Metadata ──
     preliminary = _derive_preliminary_status(entries)
@@ -60,6 +71,8 @@ async def build_context_bucket(
         image_filename=image_filename,
         voice_context=v_context,
         vision_context=vi_context,
+        adapter_context=a_context,
+        adapter_version=adapter_version,
         fusion_result=fusion,
         context_entries=entries,
         preliminary_status=preliminary,
@@ -73,7 +86,8 @@ async def build_context_bucket(
         downstream_hints={
             "report_template": "TA1" if inspection_type == "TA1" else "standard",
             "escalation_required": crit > 0,
-            "global_safety_override_triggered": has_global_override
+            "global_safety_override_triggered": has_global_override,
+            "adapter_override_triggered": (fusion.fusion_status in ["adapter_override", "adapter_conflict"])
         }
     )
 

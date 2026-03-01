@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, Literal
 from schemas.context_schema import (
     NormalizedVoiceContext,
     NormalizedVisionContext,
+    NormalizedAdapterContext,
     VisionFinding
 )
 
@@ -119,17 +120,6 @@ def normalize_vision(raw_vision: Optional[dict]) -> Optional[NormalizedVisionCon
     if quality == "insufficient_lighting" and confidence < 40:
         return None
 
-    # Handle obstruction edge case -> preserve context, wipe findings
-    if quality == "obstructed":
-        return NormalizedVisionContext(
-            visible_components=raw_vision.get("visible_components", []),
-            findings=[],
-            overall_confidence=confidence,
-            image_quality=quality,
-            critical_count=0,
-            moderate_count=0
-        )
-
     # Build Pydantic models from raw dicts
     findings = []
     crit_count = 0
@@ -154,4 +144,51 @@ def normalize_vision(raw_vision: Optional[dict]) -> Optional[NormalizedVisionCon
         image_quality=quality,
         critical_count=crit_count,
         moderate_count=mod_count
+    )
+
+def normalize_adapter(raw_adapter: Optional[dict], base_confidence: float = 0.85) -> Optional[NormalizedAdapterContext]:
+    """
+    Validates Mistral-7B Adapter output dict.
+    Returns None if adapter is missing or payload is invalid.
+    """
+    if not raw_adapter:
+        return None
+        
+    source = raw_adapter.get("source", "")
+    if source == "no_adapter":
+        return None
+        
+    raw_sev = raw_adapter.get("severity")
+    if not raw_sev:
+        # If the adapter fired but couldn't parse any severity, we treat it as no adapter signal to avoid noise
+        return None
+        
+    term = str(raw_sev).strip().lower()
+    
+    mapped_severity: Literal["Critical", "Moderate", "Normal", "Unknown"] = "Unknown"
+    if term in ["asap", "critical", "stop", "danger"]:
+        mapped_severity = "Critical"
+    elif term in ["soon", "moderate", "caution", "monitor"]:
+        mapped_severity = "Moderate"
+    elif term in ["okay", "normal", "go", "ok", "low"]:
+        mapped_severity = "Normal"
+        
+    rationale = raw_adapter.get("rationale", "")
+    component = raw_adapter.get("component", "")
+    action = raw_adapter.get("recommended_action", "")
+    
+    parts = []
+    if component: parts.append(f"Component: {component}")
+    if raw_sev: parts.append(f"Severity: {raw_sev}")
+    if rationale: parts.append(f"Rationale: {rationale}")
+    if action: parts.append(f"Action: {action}")
+    
+    raw_pred = " | ".join(parts) if parts else str(raw_adapter)
+        
+    return NormalizedAdapterContext(
+        raw_prediction=raw_pred,
+        mapped_severity=mapped_severity,
+        confidence=base_confidence,
+        anomalous_condition=rationale if rationale else None,
+        source="adapter"
     )

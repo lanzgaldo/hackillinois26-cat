@@ -29,6 +29,7 @@ from schemas.inspection_schema import (
     OperationalStatus,
     Severity,
 )
+from schemas.context_schema import NormalizedAdapterContext
 from context_engine.weight_calculator import WeightVector
 
 
@@ -51,6 +52,7 @@ class SchemaValidator:
         self,
         raw_text: str,
         weights: WeightVector,
+        adapter_context: Optional[NormalizedAdapterContext] = None,
     ) -> ValidationResult:
         """
         Args:
@@ -72,6 +74,8 @@ class SchemaValidator:
         try:
             output = InspectionOutput.model_validate(raw_dict)
             output = self.enforce_global_safety_stops(output)
+            output = self.enforce_adapter_stop_on_asap(output, adapter_context)
+            output = self.enforce_adapter_conflict_review(output, adapter_context)
             return ValidationResult(True, output, raw_dict, errors, corrections)
         except Exception as e:
             errors.append(f"Pydantic validation failed: {e}")
@@ -215,5 +219,30 @@ class SchemaValidator:
             output.summary.operational_status = OperationalStatus.STOP
             print("WARNING: Equipment grounded due to safety hazard detected outside active inspection segment.")
         
+        return output
+
+    def enforce_adapter_stop_on_asap(self, output: InspectionOutput, adapter: Optional[NormalizedAdapterContext]) -> InspectionOutput:
+        """
+        If the adapter (finetuned Mistral) explicitly rated the issue as Critical/ASAP,
+        and it wasn't already caught by standard schemas, we force operational_status to STOP
+        if it applies to a critical component.
+        """
+        if adapter and adapter.mapped_severity == "Critical":
+            if output.summary.operational_status != OperationalStatus.STOP:
+                output.summary.operational_status = OperationalStatus.STOP
+                action_pfx = f"ADAPTER OVERRIDE: {adapter.anomalous_condition}. " if adapter.anomalous_condition else "ADAPTER OVERRIDE (CRITICAL). "
+                output.summary.priority_action = action_pfx + output.summary.priority_action
+                print("WARNING: Equipment grounded due to finetuned adapter override.")
+        return output
+
+    def enforce_adapter_conflict_review(self, output: InspectionOutput, adapter: Optional[NormalizedAdapterContext]) -> InspectionOutput:
+        """
+        If the adapter prediction directly conflicts with the merged summary severity
+        (e.g., adapter=Critical but summary=Moderate/Normal), 
+        flag the output for manual technician review.
+        """
+        if adapter and adapter.mapped_severity == "Critical" and output.summary.critical_count == 0:
+            output.summary.operational_status = OperationalStatus.PENDING_VERIFICATION
+            print("WARNING: Conflict triggered. Adapter designated Critical but findings did not match.")
         return output
 
