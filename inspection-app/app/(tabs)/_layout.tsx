@@ -24,7 +24,6 @@ export default function TabLayout() {
         <Tabs
             screenOptions={{
                 headerShown: false,
-                tabBarHideOnKeyboard: true,
                 tabBarActiveTintColor: colors.primary,
                 tabBarInactiveTintColor: '#444',
                 tabBarStyle: styles.tabBar,
@@ -46,7 +45,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="reports/index"
+                name="reports"
                 options={{
                     tabBarLabel: 'REPORTS',
                     tabBarIcon: ({ color, size }) => (
@@ -55,7 +54,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="favorites/index"
+                name="favorites"
                 options={{
                     tabBarLabel: 'FAVORITES',
                     tabBarIcon: ({ color, size }) => (
