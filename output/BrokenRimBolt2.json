@@ -1,0 +1,27 @@
+{
+  "context_path": "/outputs/ccf9cfe1-8855-49c7-bd44-9a66d910d5de.json",
+  "inspection_output": {
+    "inspection_summary": {
+      "asset": "CAT D6N Dozer",
+      "status": "fail",
+      "overall_operational_impact": "Critical structural degradation identified on the rim component. Extensive rust and pitting compromise rim integrity and mounting surfaces, posing immediate risk of mounting failure, track misalignment, or catastrophic undercarriage damage during operation. Machine must not be operated until the affected rim is inspected and replaced as required."
+    },
+    "anomalies": [
+      {
+        "component": "rim",
+        "component_location": "Undercarriage \u2014 rim structure and mounting surfaces",
+        "issue": "Extensive rust and pitting on rim structure",
+        "condition_description": "Technician reported extensive rust and pitting observed across the rim structure. Corrosion is noted as affecting both the structural integrity of the rim body and the mounting surfaces, indicating advanced material degradation beyond surface-level oxidation. Pitting suggests accelerated corrosive wear that may have reduced wall thickness and load-bearing capacity of the rim. Mounting surface compromise raises risk of fastener seating failure and rim displacement under operational load.",
+        "severity": "Critical",
+        "safety_impact_assessment": "Compromised rim integrity and degraded mounting surfaces create a risk of sudden rim failure or detachment during operation. This poses a direct threat to operator safety, bystander safety, and machine stability, particularly on slopes or uneven terrain where undercarriage loads are highest.",
+        "operational_impact": "Structural failure of the rim may result in track derailment, loss of machine directional control, damage to adjacent undercarriage components including idlers and rollers, and unplanned machine downtime. Continued operation accelerates degradation and increases the probability of catastrophic failure.",
+        "estimated_timeline": "Replace immediately before next operation",
+        "recommended_action": "Remove machine from service immediately. Perform a hands-on inspection of the rim structure and all mounting hardware to assess full extent of corrosion and pitting. Replace rim assembly if structural or mounting surface integrity cannot be confirmed. Do not resume operation until replacement is completed and mounting torque is verified to specification.",
+        "part_number": null,
+        "evidence_backed": false,
+        "technician_review_required": false,
+        "confidence_score": 95
+      }
+    ]
+  }
+}

@@ -1,0 +1,164 @@
+{
+    "manifest_version": "1.0",
+    "modal_app_name": "cat-equipment-inspector",
+    "modal_volumes": {
+        "inputs": "cat-inspector-inputs",
+        "outputs": "cat-inspector-outputs",
+        "prompts": "cat-inspector-prompts"
+    },
+    "modal_secret_name": "anthropic-key",
+    "weight_profiles": {
+        "default": {
+            "visual_clarity": 0.35,
+            "severity_match": 0.30,
+            "context_alignment": 0.20,
+            "field_history": 0.15
+        },
+        "safety": {
+            "visual_clarity": 0.25,
+            "severity_match": 0.45,
+            "context_alignment": 0.20,
+            "field_history": 0.10
+        },
+        "audit": {
+            "visual_clarity": 0.20,
+            "severity_match": 0.25,
+            "context_alignment": 0.40,
+            "field_history": 0.15
+        },
+        "field": {
+            "visual_clarity": 0.20,
+            "severity_match": 0.25,
+            "context_alignment": 0.20,
+            "field_history": 0.35
+        },
+        "low_light": {
+            "visual_clarity": 0.15,
+            "severity_match": 0.30,
+            "context_alignment": 0.35,
+            "field_history": 0.20
+        }
+    },
+    "training_examples": [
+        {
+            "image_file": "BrokenRimBolt1.jpg",
+            "component_category": "tires_rims",
+            "subsection_prompt": "prompts/subsections/tires_rims.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": "tests/expected/pass_rims.json",
+            "fail_regression_guard": null,
+            "source_prompt_file": "PassPrompt2"
+        },
+        {
+            "image_file": "BrokenRimBolt2.jpg",
+            "component_category": "tires_rims",
+            "subsection_prompt": "prompts/subsections/tires_rims.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": "tests/expected/pass_rims.json",
+            "fail_regression_guard": null,
+            "source_prompt_file": "PassPrompt2"
+        },
+        {
+            "image_file": "GoodStep.jpg",
+            "component_category": "steps_access",
+            "subsection_prompt": "prompts/subsections/steps_access.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": "tests/expected/pass_steps.json",
+            "fail_regression_guard": "tests/expected/fail_regression_1.json",
+            "source_prompt_file": "PassPrompt1"
+        },
+        {
+            "image_file": "RustOnHydraulicComponentBracket.jpg",
+            "component_category": "hydraulics",
+            "subsection_prompt": "prompts/subsections/hydraulics.md",
+            "weight_profile": "default",
+            "label": "FAIL",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "StructuralDamage.jpg",
+            "component_category": "structural",
+            "subsection_prompt": "prompts/subsections/structural.md",
+            "weight_profile": "default",
+            "label": "FAIL",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "Tire_ShowsSignsUnevenWear.jpg",
+            "component_category": "tires_rims",
+            "subsection_prompt": "prompts/subsections/tires_rims.md",
+            "weight_profile": "default",
+            "label": "FAIL",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "CoolantReservoir.jpg",
+            "component_category": "cooling",
+            "subsection_prompt": "prompts/subsections/cooling.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "HousingSeal.jpg",
+            "component_category": "engine",
+            "subsection_prompt": "prompts/subsections/engine.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "HydraulicFluidFiltrationSystem.jpg",
+            "component_category": "hydraulics",
+            "subsection_prompt": "prompts/subsections/hydraulics.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "HydraulicFluidTank.jpg",
+            "component_category": "hydraulics",
+            "subsection_prompt": "prompts/subsections/hydraulics.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "HydraulicHose.jpg",
+            "component_category": "hydraulics",
+            "subsection_prompt": "prompts/subsections/hydraulics.md",
+            "weight_profile": "default",
+            "label": "PASS",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        },
+        {
+            "image_file": "CoolingSystemHose.jpg",
+            "component_category": "cooling",
+            "subsection_prompt": "prompts/subsections/cooling.md",
+            "weight_profile": "default",
+            "label": "FAIL",
+            "expected_output_file": null,
+            "fail_regression_guard": null,
+            "source_prompt_file": null
+        }
+    ]
+}

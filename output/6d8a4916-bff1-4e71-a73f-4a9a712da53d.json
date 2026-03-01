@@ -1,0 +1,65 @@
+{
+  "context_id": "6d8a4916-bff1-4e71-a73f-4a9a712da53d",
+  "session_id": null,
+  "created_at": "2026-02-28T19:20:07.854472+00:00",
+  "schema_version": "1.0.0",
+  "asset_id": "CAT D6N Dozer",
+  "component_category": "auto",
+  "inspection_type": "daily_walkaround",
+  "image_filename": null,
+  "subsection_used": null,
+  "voice_context": {
+    "raw_transcript": "Hydraulic align on the left side has a visible leak. Fluid is dripping onto the underfinch.",
+    "word_count": 16,
+    "detected_components": [
+      "hydraulic"
+    ],
+    "detected_conditions": [
+      "leak"
+    ],
+    "technician_sentiment": "urgent",
+    "inferred_severity": "Moderate",
+    "language_confidence": 0.9500000000000001,
+    "source": "voice"
+  },
+  "vision_context": null,
+  "fusion_result": {
+    "fusion_status": "voice_only",
+    "agreement_score": 0.0,
+    "reconciled_components": [],
+    "conflict_components": [],
+    "dominant_source": "voice",
+    "fusion_notes": "Vision input unavailable. Findings derived solely from technician STT."
+  },
+  "context_entries": [
+    {
+      "entry_id": "VCE-001",
+      "component": "hydraulic",
+      "component_location": null,
+      "condition_summary": "Voice transcribed issue on the hydraulic.",
+      "severity_indication": "Moderate",
+      "voice_evidence": "Hydraulic align on the left side has a visible leak. Fluid is dripping onto the underfinch.",
+      "vision_evidence": null,
+      "evidence_backed": false,
+      "technician_review_flag": false,
+      "source_perceptors": [
+        "voice"
+      ],
+      "confidence_score": 0.9500000000000001
+    }
+  ],
+  "preliminary_status": "CAUTION",
+  "critical_entry_count": 0,
+  "moderate_entry_count": 1,
+  "requires_technician_review": false,
+  "ai_overview": "Inspection of hydraulic found 0 critical and 1 moderate anomalies. Highest priority finding on hydraulic: Voice transcribed issue on the hydraulic.. Vision input unavailable. Findings derived solely from technician STT.",
+  "ai_priority_action": "Routine maintenance.",
+  "documentation_ready": true,
+  "missing_inputs": [
+    "image_input"
+  ],
+  "downstream_hints": {
+    "report_template": "standard",
+    "escalation_required": false
+  }
+}
